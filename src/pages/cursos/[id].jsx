@@ -100,7 +100,7 @@ const CourseDetail = ({ course }) => {
            {course.youtubeLinks.map((link, index) => (
              <li
                key={index}
-               className={`bg-white shadow-lg p-4 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer flex items-center justify-between ${selectedVideo === new URL(link.url).searchParams.get('v') ? 'bg-blue-100' : ''}`} // Adiciona classe se o vídeo estiver selecionado
+               className={`bg-white shadow-lg p-4 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer flex items-center justify-between ${selectedVideo === new URL(link.url).searchParams.get('v') ? 'bg-blue-200 border-2 border-blue-500' : ''}`} // Adiciona classe se o vídeo estiver selecionado
              >
                <button
                  onClick={(event) => handleVideoClick(link.url, index, event)} // Separa o clique do vídeo

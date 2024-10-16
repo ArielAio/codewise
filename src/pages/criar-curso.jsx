@@ -6,6 +6,7 @@ import { useRouter } from 'next/router'; // Importar o hook useRouter do Next.js
 
 export default function AddCourse() {
   const [courseName, setCourseName] = useState('');
+  const [courseDescription, setCourseDescription] = useState(''); // Novo estado para a descrição do curso
   const [youtubeLinks, setYoutubeLinks] = useState([{ title: '', url: '' }]); // Estado para armazenar múltiplos links com títulos
   const router = useRouter(); // Inicializa o router
 
@@ -15,6 +16,7 @@ export default function AddCourse() {
       // Adiciona o curso ao Firestore
       await addDoc(collection(db, 'cursos'), {
         title: courseName, // Salva apenas o nome do curso
+        description: courseDescription, // Salva a descrição do curso
         youtubeLinks: youtubeLinks.filter(link => link.title && link.url), // Salva os links do YouTube, removendo entradas vazias
       });
       console.log('Curso Adicionado:', { title: courseName, youtubeLinks });
@@ -54,6 +56,16 @@ export default function AddCourse() {
               value={courseName}
               onChange={(e) => setCourseName(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-lg mb-2">Descrição do Curso</label> {/* Novo campo para descrição */}
+            <textarea
+              value={courseDescription}
+              onChange={(e) => setCourseDescription(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded"
+              placeholder="Descrição do Curso"
               required
             />
           </div>

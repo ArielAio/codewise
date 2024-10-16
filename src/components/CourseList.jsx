@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import { db } from '../lib/firebaseConfig'; // Importar a configuração do Firebase
 import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore'; // Importar funções do Firestore
 import Link from 'next/link'; // Importar o componente Link do Next.js
+import { FaTrash } from 'react-icons/fa'; // Importar o ícone de lixeira
 
 const CourseList = () => {
   const [courses, setCourses] = useState([]); // Estado para armazenar os cursos
+  const [loading, setLoading] = useState(true); // Estado para controlar o carregamento
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -18,6 +20,8 @@ const CourseList = () => {
         setCourses(coursesList); // Atualiza o estado com a lista de cursos
       } catch (error) {
         console.error('Erro ao buscar cursos:', error);
+      } finally {
+        setLoading(false); // Define loading como false após a busca
       }
     };
 
@@ -44,14 +48,27 @@ const CourseList = () => {
         </button>
       </Link>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {courses.map((course) => (
-          <div key={course.id} className="bg-white rounded-lg shadow-lg p-4 transition-transform transform hover:scale-105">
-            <Link href={`/cursos/${course.id}`}>
-              <h2 className="text-xl font-semibold text-blue-600 hover:underline">{course.title}</h2>
-            </Link>
-            {/* Removido: Links das Aulas e Botão de Excluir */}
-          </div>
-        ))}
+        {loading ? ( // Verifica se está carregando
+          Array.from({ length: 6 }).map((_, index) => ( // Gera 6 skeletons
+            <div key={index} className="bg-gray-300 h-32 rounded-lg animate-pulse"></div>
+          ))
+        ) : (
+          courses.map((course) => (
+            <div key={course.id} className="bg-white rounded-lg shadow-lg p-4 transition-transform transform hover:scale-105 cursor-pointer relative">
+              <Link href={`/cursos/${course.id}`}>
+                <h2 className="text-xl font-semibold text-blue-600 hover:underline">{course.title}</h2>
+                <p className="text-gray-700 mt-2">{course.description}</p>
+              </Link>
+              <button 
+                onClick={() => handleDelete(course.id)} 
+                className="absolute top-4 right-4 text-red-500 hover:text-red-700 focus:outline-none" 
+                aria-label="Excluir curso"
+              >
+                <FaTrash size={20} />
+              </button>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

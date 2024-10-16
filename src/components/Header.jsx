@@ -30,18 +30,12 @@ export default function Header() {
         <Link href="/" className="text-2xl font-bold text-blue-600">
           CodeWise
         </Link>
-        <nav className="hidden md:flex space-x-4">
-          <Link href="/" className="text-blue-800 hover:text-blue-600" onClick={handleLinkClick}>
+        <nav className="hidden md:flex space-x-4 items-center"> {/* Adicionei items-center para alinhamento vertical */}
+          <Link href="/" className="text-blue-800 hover:text-blue-600 font-medium" onClick={handleLinkClick}>
             Início
           </Link>
-          <Link href="/cursos" className="text-blue-800 hover:text-blue-600" onClick={handleLinkClick}>
+          <Link href="/cursos" className="text-blue-800 hover:text-blue-600 font-medium" onClick={handleLinkClick}>
             Cursos
-          </Link>
-          <Link href="/sobre" className="text-blue-800 hover:text-blue-600" onClick={handleLinkClick}>
-            Sobre
-          </Link>
-          <Link href="/contato" className="text-blue-800 hover:text-blue-600" onClick={handleLinkClick}>
-            Contato
           </Link>
           <Link href="/criar-curso">
             <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
@@ -61,18 +55,12 @@ export default function Header() {
       {isMenuOpen &&
         createPortal(
           <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
-            <nav ref={menuRef} className="absolute top-16 right-4 bg-white shadow-lg rounded-md px-6 py-4 flex flex-col space-y-4">
-              <Link href="/" className="text-blue-800 hover:text-blue-600" onClick={handleLinkClick}>
+            <nav ref={menuRef} className="absolute top-16 right-4 bg-white shadow-lg rounded-md px-6 py-4 flex flex-col space-y-4 items-center"> {/* Adicionei items-center para alinhamento vertical */}
+              <Link href="/" className="text-blue-800 hover:text-blue-600 font-medium" onClick={handleLinkClick}>
                 Início
               </Link>
-              <Link href="/cursos" className="text-blue-800 hover:text-blue-600" onClick={handleLinkClick}>
+              <Link href="/cursos" className="text-blue-800 hover:text-blue-600 font-medium" onClick={handleLinkClick}>
                 Cursos
-              </Link>
-              <Link href="/sobre" className="text-blue-800 hover:text-blue-600" onClick={handleLinkClick}>
-                Sobre
-              </Link>
-              <Link href="/contato" className="text-blue-800 hover:text-blue-600" onClick={handleLinkClick}>
-                Contato
               </Link>
               <Link href="/criar-curso">
                 <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
