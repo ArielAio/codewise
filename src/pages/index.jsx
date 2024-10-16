@@ -27,13 +27,13 @@ export default function Home() {
 
       <main className="container mx-auto px-4 py-8">
         <header className="text-center mb-16">
-          <h1 className="text-6xl font-bold mb-4 text-blue-600">CodeWise</h1>
+          <h1 className="text-6xl font-bold mb-4 text-blue-600 transition-transform duration-300 transform hover:scale-105">CodeWise</h1>
           <p className="text-xl text-blue-700">Aprenda programação no seu ritmo, com serenidade e sabedoria</p>
         </header>
 
         <section className="mb-16">
           <h2 className="text-3xl font-semibold mb-8 text-center text-blue-800">Cursos em Destaque</h2>
-          <div className="bg-white rounded-lg p-8 shadow-lg transition-all duration-300 hover:shadow-xl">
+          <div className="bg-white rounded-lg p-8 shadow-lg transition-all duration-300 hover:shadow-xl hover:bg-blue-50">
             <div className="text-center">
               <span className="text-6xl mb-4 inline-block transition-all duration-500 ease-in-out transform hover:scale-110">
                 {courses[currentCourse].icon}
@@ -63,7 +63,7 @@ export default function Home() {
         <section className="text-center mb-16">
           <h2 className="text-3xl font-semibold mb-8 text-blue-800">Comece sua jornada de aprendizado</h2>
           <p className="text-lg mb-8 text-blue-700">Descubra seu potencial e transforme sua carreira com a CodeWise</p>
-          <a href="#" className="bg-blue-600 text-white px-8 py-4 rounded-full text-xl font-bold inline-block transition-all duration-300 hover:bg-blue-500 hover:shadow-lg transform hover:-translate-y-1">
+          <a href="/cursos" className="bg-blue-600 text-white px-8 py-4 rounded-full text-xl font-bold inline-block transition-all duration-300 hover:bg-blue-500 hover:shadow-lg transform hover:-translate-y-1 hover:scale-105">
             Explorar Cursos
           </a>
         </section>

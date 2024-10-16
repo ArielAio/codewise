@@ -30,6 +30,11 @@ export default function Header() {
         >
           {isMenuOpen ? '✕' : '☰'}
         </button>
+        <Link href="/criar-curso">
+          <button className="ml-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            Criar Curso
+          </button>
+        </Link>
       </div>
       {isMenuOpen && (
         <nav className="md:hidden bg-white px-4 py-2 flex flex-col space-y-2">
