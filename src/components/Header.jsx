@@ -1,8 +1,28 @@
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef(null); // Referência para o menu
+
+  const handleClickOutside = (event) => {
+    if (menuRef.current && !menuRef.current.contains(event.target)) {
+      setIsMenuOpen(false); // Fecha o menu se clicar fora
+    }
+  };
+
+  useEffect(() => {
+    // Adiciona o evento de clique fora do menu
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleLinkClick = () => {
+    setIsMenuOpen(false); // Fecha o menu ao selecionar uma opção
+  };
 
   return (
     <header className="bg-white shadow-md">
@@ -11,17 +31,22 @@ export default function Header() {
           CodeWise
         </Link>
         <nav className="hidden md:flex space-x-4">
-          <Link href="/" className="text-blue-800 hover:text-blue-600">
+          <Link href="/" className="text-blue-800 hover:text-blue-600" onClick={handleLinkClick}>
             Início
           </Link>
-          <Link href="/cursos" className="text-blue-800 hover:text-blue-600">
+          <Link href="/cursos" className="text-blue-800 hover:text-blue-600" onClick={handleLinkClick}>
             Cursos
           </Link>
-          <Link href="/sobre" className="text-blue-800 hover:text-blue-600">
+          <Link href="/sobre" className="text-blue-800 hover:text-blue-600" onClick={handleLinkClick}>
             Sobre
           </Link>
-          <Link href="/contato" className="text-blue-800 hover:text-blue-600">
+          <Link href="/contato" className="text-blue-800 hover:text-blue-600" onClick={handleLinkClick}>
             Contato
+          </Link>
+          <Link href="/criar-curso">
+            <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+              Criar Curso
+            </button>
           </Link>
         </nav>
         <button
@@ -30,28 +55,34 @@ export default function Header() {
         >
           {isMenuOpen ? '✕' : '☰'}
         </button>
-        <Link href="/criar-curso">
-          <button className="ml-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-            Criar Curso
-          </button>
-        </Link>
       </div>
-      {isMenuOpen && (
-        <nav className="md:hidden bg-white px-4 py-2 flex flex-col space-y-2">
-          <Link href="/" className="text-blue-800 hover:text-blue-600">
-            Início
-          </Link>
-          <Link href="/cursos" className="text-blue-800 hover:text-blue-600">
-            Cursos
-          </Link>
-          <Link href="/sobre" className="text-blue-800 hover:text-blue-600">
-            Sobre
-          </Link>
-          <Link href="/contato" className="text-blue-800 hover:text-blue-600">
-            Contato
-          </Link>
-        </nav>
-      )}
+
+      {/* Usando Portal para renderizar o menu fora do fluxo normal da div */}
+      {isMenuOpen &&
+        createPortal(
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
+            <nav ref={menuRef} className="absolute top-16 right-4 bg-white shadow-lg rounded-md px-6 py-4 flex flex-col space-y-4">
+              <Link href="/" className="text-blue-800 hover:text-blue-600" onClick={handleLinkClick}>
+                Início
+              </Link>
+              <Link href="/cursos" className="text-blue-800 hover:text-blue-600" onClick={handleLinkClick}>
+                Cursos
+              </Link>
+              <Link href="/sobre" className="text-blue-800 hover:text-blue-600" onClick={handleLinkClick}>
+                Sobre
+              </Link>
+              <Link href="/contato" className="text-blue-800 hover:text-blue-600" onClick={handleLinkClick}>
+                Contato
+              </Link>
+              <Link href="/criar-curso">
+                <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                  Criar Curso
+                </button>
+              </Link>
+            </nav>
+          </div>,
+          document.body // Renderiza o menu fora do fluxo normal
+        )}
     </header>
   );
 }
