@@ -104,7 +104,9 @@ export default function Home() {
               </Link>
             </div>
           ) : (
-            <p className="text-lg text-gray-500">Nenhum curso disponível no momento.</p>
+            <div className="text-center">
+              <p className="text-lg text-gray-500">Nenhum curso disponível no momento.</p>
+            </div>
           )}
         </section>
 
