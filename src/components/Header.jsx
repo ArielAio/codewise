@@ -14,7 +14,8 @@ export default function Header() {
     setIsHovering(false);
   };
 
-  const handleClick = () => {
+  const handleClick = (e) => {
+    e.stopPropagation();
     setIsMenuOpen(!isMenuOpen);
   };
 
@@ -30,6 +31,8 @@ export default function Header() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  const showMenu = isMenuOpen || isHovering;
 
   return (
     <header className="bg-[#001a33] shadow-md relative z-10">
@@ -51,7 +54,7 @@ export default function Header() {
             >
               ☰
             </button>
-            {(isMenuOpen || isHovering) && (
+            {showMenu && (
               <div className="absolute right-0 mt-2 w-48 bg-[#002b4d] rounded-lg shadow-xl py-2 z-20">
                 <Link href="/" className="block px-4 py-2 text-[#00FA9A] hover:bg-[#003a66] flex items-center">
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -74,26 +77,6 @@ export default function Header() {
           </div>
         </nav>
       </div>
-
-      {isMenuOpen &&
-        createPortal(
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
-            <nav ref={menuRef} className="absolute top-16 right-4 bg-[#001a33] shadow-lg rounded-md px-6 py-4 flex flex-col space-y-4 items-center">
-              <Link href="/" className="text-[#00FA9A] hover:text-[#33FBB1] font-medium" onClick={handleLinkClick}>
-
-                Início
-              </Link>
-              <Link href="/cursos" className="text-[#00FA9A] hover:text-[#33FBB1] font-medium" onClick={handleLinkClick}>
-                Cursos
-              </Link>
-              <Link href="/criar-curso" className="bg-[#00FA9A] text-[#001a33] px-4 py-2 rounded hover:bg-[#33FBB1] font-medium">
-                Criar Curso
-              </Link>
-            </nav>
-          </div>,
-          document.body
-        )}
     </header>
   );
 }
-//tmj

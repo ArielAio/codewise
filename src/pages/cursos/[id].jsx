@@ -53,72 +53,82 @@ const CourseDetail = ({ course }) => {
       
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 text-blue-900">
+    <div className="min-h-screen bg-white text-[#001a33]">
       <Head>
         <title>{course.title} - CodeWise</title>
       </Head>
 
-      <main className="container mx-auto px-4 py-16 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <section className="lg:col-span-2">
-          <h1 className="text-4xl font-bold mb-6">{course.title}</h1>
+      <main className="container mx-auto px-4 py-16">
+        <div className="flex justify-center mb-8">
+          <div className="inline-block bg-[#001a33] rounded-lg px-6 py-3">
+            <h1 className="text-6xl font-bold text-center text-[#00FA9A]">CodeWise</h1>
+          </div>
+        </div>
+        <p className="text-xl text-center mb-12 text-[#001a33]">Aprenda programação no seu ritmo, com serenidade e sabedoria</p>
 
-          {selectedVideo ? (
-            <div className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">
-                {course.youtubeLinks.find((link) => link.url.includes(selectedVideo)).title}
-              </h2>
-              <iframe
-                width="100%"
-                height="450"
-                src={`https://www.youtube.com/embed/${selectedVideo}`}
-                title="YouTube video player"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="rounded-lg shadow-lg"
-              ></iframe>
-              <button onClick={handleNextVideo} className="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
-                Próximo Vídeo
-              </button>
-            </div>
-          ) : (
-            <p>Selecione uma aula para assistir.</p>
-          )}
-        </section>
+        <h2 className="text-4xl font-bold mb-8 text-center text-[#001a33]">{course.title}</h2>
 
-        <aside className="lg:col-span-1">
-          <h2 className="text-2xl font-semibold mb-4">Aulas do Curso</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <section className="lg:col-span-2 bg-[#001a33] rounded-lg p-6 shadow-lg border border-[#00FA9A]">
+            {selectedVideo ? (
+              <div className="mb-8">
+                <h3 className="text-2xl font-semibold mb-4 text-[#00FA9A]">
+                  {course.youtubeLinks.find((link) => link.url.includes(selectedVideo)).title}
+                </h3>
+                <iframe
+                  width="100%"
+                  height="450"
+                  src={`https://www.youtube.com/embed/${selectedVideo}`}
+                  title="YouTube video player"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="rounded-lg shadow-lg"
+                ></iframe>
+                <button onClick={handleNextVideo} className="mt-4 bg-[#00FA9A] hover:bg-opacity-80 text-[#001a33] font-bold px-6 py-2 rounded transition duration-300">
+                  Próximo Vídeo
+                </button>
+              </div>
+            ) : (
+              <p className="text-white">Selecione uma aula para assistir.</p>
+            )}
+          </section>
 
-          {course.youtubeLinks && course.youtubeLinks.length > 0 ? (
-           <ul className="space-y-4">
-           {course.youtubeLinks.map((link, index) => (
-             <li
-               key={index}
-               className={`bg-white shadow-lg p-4 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer flex items-center justify-between ${selectedVideo === new URL(link.url).searchParams.get('v') ? 'bg-blue-300 border-2 border-blue-500' : ''}`}
-             >
-               <button
-                 onClick={(event) => handleVideoClick(link.url, index, event)}
-                 className="text-lg font-medium text-blue-900 w-full text-left"
-               >
-                 {link.title}
-               </button>
-               <div className="flex items-center">
-                 <input
-                   type="checkbox"
-                   checked={watchedVideos[index] || false}
-                   onChange={(event) => handleCheckboxToggle(index, event)}
-                   className="ml-4 w-6 h-6"
-                   onClick={(event) => event.stopPropagation()}
-                 />
-               </div>
-             </li>
-           ))}
-         </ul>
-         
-          ) : (
-            <p>Não há links de aulas disponíveis para este curso.</p>
-          )}
-        </aside>
+          <aside className="lg:col-span-1 bg-[#001a33] rounded-lg p-6 shadow-lg border border-[#00FA9A]">
+            <h3 className="text-2xl font-semibold mb-4 text-[#00FA9A]">Aulas do Curso</h3>
+
+            {course.youtubeLinks && course.youtubeLinks.length > 0 ? (
+              <ul className="space-y-4">
+                {course.youtubeLinks.map((link, index) => (
+                  <li
+                    key={index}
+                    className={`bg-[#001a33] shadow-lg p-4 rounded-lg hover:bg-opacity-80 transition-colors cursor-pointer flex items-center justify-between ${
+                      selectedVideo === new URL(link.url).searchParams.get('v') ? 'border-2 border-[#00FA9A]' : ''
+                    }`}
+                  >
+                    <button
+                      onClick={(event) => handleVideoClick(link.url, index, event)}
+                      className="text-lg font-bold text-white w-full text-left"
+                    >
+                      {link.title}
+                    </button>
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={watchedVideos[index] || false}
+                        onChange={(event) => handleCheckboxToggle(index, event)}
+                        className="ml-4 w-6 h-6 accent-[#00FA9A]"
+                        onClick={(event) => event.stopPropagation()}
+                      />
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-white">Não há links de aulas disponíveis para este curso.</p>
+            )}
+          </aside>
+        </div>
       </main>
     </div>
   );

@@ -66,14 +66,14 @@ export default function AddCourse() {
           <p className="text-xl text-white">Crie um novo curso para a plataforma CodeWise</p>
         </header>
 
-        <form onSubmit={handleSubmit} className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
+        <form onSubmit={handleSubmit} className="max-w-2xl mx-auto bg-[#001a33] p-8 rounded-lg shadow-md text-white">
           <div className="mb-6">
             <label className="block text-lg mb-2 font-semibold">Nome do Curso</label>
             <input
               type="text"
               value={courseName}
               onChange={(e) => setCourseName(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00FA9A]"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00FA9A] text-[#001a33]"
               required
             />
           </div>
@@ -82,7 +82,7 @@ export default function AddCourse() {
             <textarea
               value={courseDescription}
               onChange={(e) => setCourseDescription(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00FA9A]"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00FA9A] text-[#001a33]"
               placeholder="Descreva o conteúdo do curso"
               rows="4"
               required
@@ -97,16 +97,15 @@ export default function AddCourse() {
                   type="text"
                   value={link.title}
                   onChange={(e) => handleLinkChange(index, 'title', e.target.value)}
-                  className="w-1/2 p-3 border border-gray-300 rounded-lg mr-2 focus:outline-none focus:ring-2 focus:ring-[#00FA9A]"
+                  className="w-1/2 p-3 border border-gray-300 rounded-lg mr-2 focus:outline-none focus:ring-2 focus:ring-[#00FA9A] text-[#001a33]"
                   placeholder="Título do Link"
-
                   required
                 />
                 <input
                   type="url"
                   value={link.url}
                   onChange={(e) => handleLinkChange(index, 'url', e.target.value)}
-                  className="w-1/2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00FA9A]"
+                  className="w-1/2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00FA9A] text-[#001a33]"
                   placeholder="Link do YouTube"
                   required
                 />
