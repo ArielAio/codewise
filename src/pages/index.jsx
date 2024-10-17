@@ -94,18 +94,19 @@ export default function Home() {
             <div className="bg-gray-300 h-32 rounded-lg animate-pulse"></div>
           ) : cursos.length > 0 ? (
             <div className="text-center mb-4">
-              <span className="text-6xl mb-4 inline-block transition-all duration-500 ease-in-out transform hover:scale-110">
-                {getRandomEmoji()}
-              </span>
-              <h3 className="text-2xl font-semibold text-[#001a33]">
-                <Link href={`/cursos/${cursos[currentCourseIndex]?.id}`}>
-                  {cursos.length > 0 ? cursos[currentCourseIndex]?.title : 'Curso Indisponível'}
-                </Link>
-              </h3>
+              <div className="inline-block transition-all duration-500 ease-in-out transform hover:scale-110 cursor-pointer">
+                <span className="text-6xl mb-4 inline-block">
+                  {getRandomEmoji()}
+                </span>
+                <h3 className="text-2xl font-semibold text-[#001a33]">
+                  <Link href={`/cursos/${cursos[currentCourseIndex]?.id}`}>
+                    {cursos.length > 0 ? cursos[currentCourseIndex]?.title : 'Curso Indisponível'}
+                  </Link>
+                </h3>
+              </div>
             </div>
           ) : (
             <p className="text-lg text-[#001a33]">Nenhum curso disponível no momento.</p>
-
           )}
         </section>
 
