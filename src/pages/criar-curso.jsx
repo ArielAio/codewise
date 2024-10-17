@@ -53,6 +53,16 @@ export default function AddCourse() {
     setYoutubeLinks(newLinks);
   };
 
+  const isValidYouTubeUrl = (url) => {
+    const regex = /^(https?\:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+$/;
+    return regex.test(url);
+  };
+
+  const getYouTubeEmbedUrl = (url) => {
+    const videoId = url.split('v=')[1]?.split('&')[0] || url.split('/').pop();
+    return `https://www.youtube.com/embed/${videoId}`;
+  };
+
   return (
     <div className="min-h-screen bg-white text-[#001a33]">
       <Head>
@@ -74,6 +84,7 @@ export default function AddCourse() {
               value={courseName}
               onChange={(e) => setCourseName(e.target.value)}
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00FA9A] text-[#001a33]"
+              placeholder='Insira o Nome do Curso'
               required
             />
           </div>
@@ -89,31 +100,48 @@ export default function AddCourse() {
             />
           </div>
           <div className="mb-6">
-            <label className="block text-lg mb-2 font-semibold">Links do YouTube</label>
+            <label className="block text-lg mb-2 font-semibold">Adicionar Aula</label>
 
             {youtubeLinks.map((link, index) => (
-              <div key={index} className="flex mb-4">
-                <input
-                  type="text"
-                  value={link.title}
-                  onChange={(e) => handleLinkChange(index, 'title', e.target.value)}
-                  className="w-1/2 p-3 border border-gray-300 rounded-lg mr-2 focus:outline-none focus:ring-2 focus:ring-[#00FA9A] text-[#001a33]"
-                  placeholder="Título do Link"
-                  required
-                />
-                <input
-                  type="url"
-                  value={link.url}
-                  onChange={(e) => handleLinkChange(index, 'url', e.target.value)}
-                  className="w-1/2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00FA9A] text-[#001a33]"
-                  placeholder="Link do YouTube"
-                  required
-                />
-                {index > 0 && (
-                  <button type="button" onClick={() => removeLinkField(index)} className="text-red-600 ml-2 flex items-center">
-                    <FaTrash className="h-5 w-5 mr-1" />
-                    Remover
-                  </button>
+              <div key={index} className="mb-4">
+                <div className="flex">
+                  <input
+                    type="text"
+                    value={link.title}
+                    onChange={(e) => handleLinkChange(index, 'title', e.target.value)}
+                    className="w-1/2 p-3 border border-gray-300 rounded-lg mr-2 focus:outline-none focus:ring-2 focus:ring-[#00FA9A] text-[#001a33]"
+                    placeholder="Título da Aula"
+                    required
+                  />
+                  <input
+                    type="url"
+                    value={link.url}
+                    onChange={(e) => handleLinkChange(index, 'url', e.target.value)}
+                    className="w-1/2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00FA9A] text-[#001a33]"
+                    placeholder="Link do YouTube"
+                    required
+                  />
+                  {index > 0 && (
+                    <button type="button" onClick={() => removeLinkField(index)} className="text-red-600 ml-2 flex items-center">
+                      <FaTrash className="h-5 w-5 mr-1" />
+                      Remover
+                    </button>
+                  )}
+                </div>
+
+                {isValidYouTubeUrl(link.url) && (
+                  <div className="mt-4">
+                    <iframe
+                      width="560"
+                      height="315"
+                      src={getYouTubeEmbedUrl(link.url)}
+                      title={link.title || `Vídeo ${index + 1}`}
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      className="w-full"
+                    ></iframe>
+                  </div>
                 )}
               </div>
             ))}
