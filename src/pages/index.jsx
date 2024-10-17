@@ -2,80 +2,76 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { db } from '../lib/firebaseConfig'; // Importar a configuração do Firebase
-import { collection, getDocs } from 'firebase/firestore'; // Importar funções do Firestore
-import Slider from 'react-slick'; // Importa o componente Slider
-import 'slick-carousel/slick/slick.css'; // Importa os estilos do slick
-import 'slick-carousel/slick/slick-theme.css'; // Importa os temas do slick
+import { db } from '../lib/firebaseConfig';
+import { collection, getDocs } from 'firebase/firestore';
 
 export default function Home() {
-  const [currentCourseIndex, setCurrentCourseIndex] = useState(0); // Estado para controlar o curso atual
-  const [cursos, setCursos] = useState([]); // Estado para armazenar os cursos
-  const [loading, setLoading] = useState(true); // Estado para controlar o carregamento
+  const [currentCourseIndex, setCurrentCourseIndex] = useState(0);
+  const [cursos, setCursos] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCursos = async () => {
       try {
-        const cursosCollection = collection(db, 'cursos'); // Nome da coleção no Firestore
+        const cursosCollection = collection(db, 'cursos');
         const cursosSnapshot = await getDocs(cursosCollection);
         const cursosList = cursosSnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),
         }));
-        setCursos(cursosList); // Atualiza o estado com a lista de cursos
+        setCursos(cursosList);
       } catch (error) {
         console.error('Erro ao buscar cursos:', error);
       } finally {
-        setLoading(false); // Define loading como false após a busca
+        setLoading(false);
       }
     };
 
-    fetchCursos(); // Chama a função para buscar os cursos
+    fetchCursos();
 
-    // Adiciona um intervalo para mudar automaticamente os cursos
     const interval = setInterval(() => {
-      nextCourse(); // Chama a função para ir para o próximo curso
-    }, 3000); // Muda a cada 3 segundos
+      nextCourse();
+    }, 3000);
 
-    return () => clearInterval(interval); // Limpa o intervalo ao desmontar o componente
-  }, [cursos.length]); // Adiciona cursos.length como dependência
+    return () => clearInterval(interval);
+  }, [cursos.length]);
 
   const nextCourse = () => {
-    if (cursos.length > 0) { // Verifica se há cursos
-      setCurrentCourseIndex((prevIndex) => (prevIndex + 1) % cursos.length); // Atualiza o índice do curso
+    if (cursos.length > 0) {
+      setCurrentCourseIndex((prevIndex) => (prevIndex + 1) % cursos.length);
     }
   };
 
   const prevCourse = () => {
-    if (cursos.length > 0) { // Verifica se há cursos
-      setCurrentCourseIndex((prevIndex) => (prevIndex - 1 + cursos.length) % cursos.length); // Atualiza o índice do curso
+    if (cursos.length > 0) {
+      setCurrentCourseIndex((prevIndex) => (prevIndex - 1 + cursos.length) % cursos.length);
     }
   };
 
-  const usedEmojis = new Set(); // Conjunto para rastrear emojis usados
+  const usedEmojis = new Set();
 
   const getRandomEmoji = () => {
     const emojis = ['💻', '👨‍💻', '👩‍💻', '🖥️', '📱', '🧑‍💻', '🔧', '🛠️', '📊', '📈', '💡', '🧩'];
-    const availableEmojis = emojis.filter(emoji => !usedEmojis.has(emoji)); // Filtra emojis já usados
+    const availableEmojis = emojis.filter(emoji => !usedEmojis.has(emoji));
 
     if (availableEmojis.length === 0) {
-      return null; // Retorna null se todos os emojis foram usados
+      return null;
     }
 
     const randomIndex = Math.floor(Math.random() * availableEmojis.length);
     const selectedEmoji = availableEmojis[randomIndex];
-    usedEmojis.add(selectedEmoji); // Adiciona o emoji selecionado ao conjunto de usados
+    usedEmojis.add(selectedEmoji);
     return selectedEmoji;
   };
 
   const settings = {
-    dots: true, // Exibe os pontos de navegação
-    infinite: true, // Permite rolar infinitamente
-    speed: 500, // Velocidade da transição
-    slidesToShow: 1, // Número de slides a serem exibidos
-    slidesToScroll: 1, // Número de slides a serem rolados
-    autoplay: true, // Ativa o autoplay
-    autoplaySpeed: 3000, // Tempo em milissegundos entre as transições
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
   };
 
   return (
@@ -109,6 +105,7 @@ export default function Home() {
             </div>
           ) : (
             <p className="text-lg text-[#001a33]">Nenhum curso disponível no momento.</p>
+
           )}
         </section>
 
