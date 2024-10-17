@@ -4,16 +4,15 @@ import { createPortal } from 'react-dom';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const menuRef = useRef(null); // Referência para o menu
+  const menuRef = useRef(null);
 
   const handleClickOutside = (event) => {
     if (menuRef.current && !menuRef.current.contains(event.target)) {
-      setIsMenuOpen(false); // Fecha o menu se clicar fora
+      setIsMenuOpen(false);
     }
   };
 
   useEffect(() => {
-    // Adiciona o evento de clique fora do menu
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
@@ -21,7 +20,7 @@ export default function Header() {
   }, []);
 
   const handleLinkClick = () => {
-    setIsMenuOpen(false); // Fecha o menu ao selecionar uma opção
+    setIsMenuOpen(false);
   };
 
   return (
@@ -30,7 +29,7 @@ export default function Header() {
         <Link href="/" className="text-2xl font-bold text-blue-600">
           CodeWise
         </Link>
-        <nav className="hidden md:flex space-x-4 items-center"> {/* Adicionei items-center para alinhamento vertical */}
+        <nav className="hidden md:flex space-x-4 items-center">
           <Link href="/" className="text-blue-800 hover:text-blue-600 font-medium" onClick={handleLinkClick}>
             Início
           </Link>
@@ -51,11 +50,10 @@ export default function Header() {
         </button>
       </div>
 
-      {/* Usando Portal para renderizar o menu fora do fluxo normal da div */}
       {isMenuOpen &&
         createPortal(
           <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
-            <nav ref={menuRef} className="absolute top-16 right-4 bg-white shadow-lg rounded-md px-6 py-4 flex flex-col space-y-4 items-center"> {/* Adicionei items-center para alinhamento vertical */}
+            <nav ref={menuRef} className="absolute top-16 right-4 bg-white shadow-lg rounded-md px-6 py-4 flex flex-col space-y-4 items-center">
               <Link href="/" className="text-blue-800 hover:text-blue-600 font-medium" onClick={handleLinkClick}>
                 Início
               </Link>
@@ -69,7 +67,7 @@ export default function Header() {
               </Link>
             </nav>
           </div>,
-          document.body // Renderiza o menu fora do fluxo normal
+          document.body
         )}
     </header>
   );
