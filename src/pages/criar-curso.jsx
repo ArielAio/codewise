@@ -54,52 +54,58 @@ export default function AddCourse() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 text-blue-900">
+    <div className="min-h-screen bg-white text-[#001a33]">
       <Head>
         <title>Adicionar Curso - CodeWise</title>
+        <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold mb-4 text-center">Adicionar Novo Curso</h1>
-        <form onSubmit={handleSubmit} className="max-w-md mx-auto">
-          <div className="mb-4">
-            <label className="block text-lg mb-2">Nome do Curso</label>
+        <header className="text-center mb-16 bg-[#001a33] py-8 rounded-lg">
+          <h1 className="text-4xl font-bold mb-4 text-[#00FA9A]">Adicionar Novo Curso</h1>
+          <p className="text-xl text-white">Crie um novo curso para a plataforma CodeWise</p>
+        </header>
+
+        <form onSubmit={handleSubmit} className="max-w-2xl mx-auto bg-[#001a33] p-8 rounded-lg shadow-md text-white">
+          <div className="mb-6">
+            <label className="block text-lg mb-2 font-semibold">Nome do Curso</label>
             <input
               type="text"
               value={courseName}
               onChange={(e) => setCourseName(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded"
-              placeholder="Insira o Nome do Curso"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00FA9A] text-[#001a33]"
               required
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-lg mb-2">Descrição do Curso</label>
+          <div className="mb-6">
+            <label className="block text-lg mb-2 font-semibold">Descrição do Curso</label>
             <textarea
               value={courseDescription}
               onChange={(e) => setCourseDescription(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded"
-              placeholder="Insira a Descrição do Curso"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00FA9A] text-[#001a33]"
+              placeholder="Descreva o conteúdo do curso"
+              rows="4"
               required
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-lg mb-2">Adicionar Aula</label>
+          <div className="mb-6">
+            <label className="block text-lg mb-2 font-semibold">Links do YouTube</label>
+
             {youtubeLinks.map((link, index) => (
-              <div key={index} className="flex mb-2">
+              <div key={index} className="flex mb-4">
                 <input
                   type="text"
                   value={link.title}
                   onChange={(e) => handleLinkChange(index, 'title', e.target.value)}
-                  className="w-1/2 p-2 border border-gray-300 rounded mr-2"
-                  placeholder="Título da Aula"
+                  className="w-1/2 p-3 border border-gray-300 rounded-lg mr-2 focus:outline-none focus:ring-2 focus:ring-[#00FA9A] text-[#001a33]"
+                  placeholder="Título do Link"
                   required
                 />
                 <input
                   type="url"
                   value={link.url}
                   onChange={(e) => handleLinkChange(index, 'url', e.target.value)}
-                  className="w-1/2 p-2 border border-gray-300 rounded"
+                  className="w-1/2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00FA9A] text-[#001a33]"
                   placeholder="Link do YouTube"
                   required
                 />
@@ -111,15 +117,26 @@ export default function AddCourse() {
                 )}
               </div>
             ))}
-            <button type="button" onClick={addLinkField} className="text-blue-600">
-              Adicionar Outro Link
+            <button 
+              type="button" 
+              onClick={addLinkField} 
+              className="text-[#00FA9A] font-semibold hover:text-[#33FBB1] transition-colors duration-300"
+            >
+              + Adicionar Outro Link
             </button>
           </div>
-          <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
+          <button 
+            type="submit" 
+            className="bg-[#00FA9A] text-[#001a33] px-8 py-3 rounded-full text-xl font-bold inline-block transition-all duration-300 hover:bg-[#33FBB1] hover:shadow-lg transform hover:-translate-y-1 hover:scale-105"
+          >
             Adicionar Curso
           </button>
         </form>
       </main>
+
+      <footer className="text-center py-8 bg-[#001a33] text-white mt-16">
+        <p>&copy; 2023 CodeWise. Transformando vidas através da programação.</p>
+      </footer>
     </div>
   );
 }
