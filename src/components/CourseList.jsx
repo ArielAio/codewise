@@ -17,7 +17,7 @@ const CourseList = () => {
           id: doc.id,
           ...doc.data(),
         }));
-        setCourses(coursesList); // Atualiza o estado com a lista de cursos
+        setCourses(coursesList); // Atualiza o estado com a lista de curso
       } catch (error) {
         console.error('Erro ao buscar cursos:', error);
       } finally {
