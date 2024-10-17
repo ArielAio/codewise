@@ -24,26 +24,24 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-white shadow-md">
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <Link href="/" className="text-2xl font-bold text-blue-600">
+    <header className="bg-[#001a33] shadow-md relative z-10">
+      <div classNacme="container mx-auto px-4 py-4 flex justify-between items-center">
+        <Link href="/" className="text-2xl font-bold text-[#00FA9A]">
           CodeWise
         </Link>
         <nav className="hidden md:flex space-x-4 items-center">
-          <Link href="/" className="text-blue-800 hover:text-blue-600 font-medium" onClick={handleLinkClick}>
+          <Link href="/" className="text-[#00FA9A] hover:text-[#33FBB1] font-medium" onClick={handleLinkClick}>
             Início
           </Link>
-          <Link href="/cursos" className="text-blue-800 hover:text-blue-600 font-medium" onClick={handleLinkClick}>
+          <Link href="/cursos" className="text-[#00FA9A] hover:text-[#33FBB1] font-medium" onClick={handleLinkClick}>
             Cursos
           </Link>
-          <Link href="/criar-curso">
-            <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-              Criar Curso
-            </button>
+          <Link href="/criar-curso" className="bg-[#00FA9A] text-[#001a33] px-4 py-2 rounded hover:bg-[#33FBB1] font-medium">
+            Criar Curso
           </Link>
         </nav>
         <button
-          className="md:hidden text-blue-800 hover:text-blue-600"
+          className="md:hidden text-[#00FA9A] hover:text-[#33FBB1]"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
           {isMenuOpen ? '✕' : '☰'}
@@ -53,17 +51,16 @@ export default function Header() {
       {isMenuOpen &&
         createPortal(
           <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
-            <nav ref={menuRef} className="absolute top-16 right-4 bg-white shadow-lg rounded-md px-6 py-4 flex flex-col space-y-4 items-center">
-              <Link href="/" className="text-blue-800 hover:text-blue-600 font-medium" onClick={handleLinkClick}>
+            <nav ref={menuRef} className="absolute top-16 right-4 bg-[#001a33] shadow-lg rounded-md px-6 py-4 flex flex-col space-y-4 items-center">
+              <Link href="/" className="text-[#00FA9A] hover:text-[#33FBB1] font-medium" onClick={handleLinkClick}>
+
                 Início
               </Link>
-              <Link href="/cursos" className="text-blue-800 hover:text-blue-600 font-medium" onClick={handleLinkClick}>
+              <Link href="/cursos" className="text-[#00FA9A] hover:text-[#33FBB1] font-medium" onClick={handleLinkClick}>
                 Cursos
               </Link>
-              <Link href="/criar-curso">
-                <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                  Criar Curso
-                </button>
+              <Link href="/criar-curso" className="bg-[#00FA9A] text-[#001a33] px-4 py-2 rounded hover:bg-[#33FBB1] font-medium">
+                Criar Curso
               </Link>
             </nav>
           </div>,
