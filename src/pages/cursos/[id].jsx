@@ -25,28 +25,22 @@ const CourseDetail = ({ course }) => {
     );
 
     const handleVideoClick = (url, index, event) => {
-        event.stopPropagation(); // Impede que o clique no nome do vídeo afete o checkbox
-      
+        event.stopPropagation();
         const currentIndex = course.youtubeLinks.findIndex(link => link.url.includes(selectedVideo));
-        
-        // Se o vídeo clicado for diferente do vídeo selecionado, marca o atual como assistido
         if (currentIndex !== -1) {
           setWatchedVideos((prev) => ({
             ...prev,
-            [currentIndex]: true, // Marca a aula atual como assistida
+            [currentIndex]: true,
           }));
         }
-      
-        // Atualiza o vídeo selecionado
         setSelectedVideo(new URL(url).searchParams.get('v'));
       };
       
-      // Checkbox permanece inalterado
       const handleCheckboxToggle = (index, event) => {
-        event.stopPropagation(); // Impede que o clique no checkbox afete o vídeo
+        event.stopPropagation();
         setWatchedVideos((prev) => ({
           ...prev,
-          [index]: !prev[index], // Alterna o estado de visualização do vídeo
+          [index]: !prev[index],
         }));
       };
       
@@ -100,10 +94,10 @@ const CourseDetail = ({ course }) => {
            {course.youtubeLinks.map((link, index) => (
              <li
                key={index}
-               className={`bg-white shadow-lg p-4 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer flex items-center justify-between ${selectedVideo === new URL(link.url).searchParams.get('v') ? 'bg-blue-200 border-2 border-blue-500' : ''}`} // Adiciona classe se o vídeo estiver selecionado
+               className={`bg-white shadow-lg p-4 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer flex items-center justify-between ${selectedVideo === new URL(link.url).searchParams.get('v') ? 'bg-blue-300 border-2 border-blue-500' : ''}`}
              >
                <button
-                 onClick={(event) => handleVideoClick(link.url, index, event)} // Separa o clique do vídeo
+                 onClick={(event) => handleVideoClick(link.url, index, event)}
                  className="text-lg font-medium text-blue-900 w-full text-left"
                >
                  {link.title}
@@ -112,9 +106,9 @@ const CourseDetail = ({ course }) => {
                  <input
                    type="checkbox"
                    checked={watchedVideos[index] || false}
-                   onChange={(event) => handleCheckboxToggle(index, event)} // Checkbox separado
+                   onChange={(event) => handleCheckboxToggle(index, event)}
                    className="ml-4 w-6 h-6"
-                   onClick={(event) => event.stopPropagation()} // Garante que o checkbox não afete o clique no item da lista
+                   onClick={(event) => event.stopPropagation()}
                  />
                </div>
              </li>
