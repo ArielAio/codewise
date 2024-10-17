@@ -48,29 +48,30 @@ const CourseList = () => {
   };
 
   return (
-    <div className="container mx-auto bg-[#002b4d] rounded-3xl shadow-2xl overflow-hidden my-8">
+    <div className="container mx-auto bg-[#001a2c] rounded-3xl shadow-2xl overflow-hidden my-8">
       <div className="p-8">
-        <h1 className="text-4xl font-bold mb-8 text-center text-[#00FA9A]">Lista de Cursos</h1>
+        <h1 className="text-4xl font-bold mb-4 text-center text-[#00FA9A]">Lista de Cursos</h1>
+        <p className="text-center text-white mb-8">Explore nossa seleção de cursos e comece sua jornada de aprendizado</p>
         <Link href="/criar-curso">
-          <button className="mb-8 bg-[#00FA9A] text-[#001a33] px-6 py-3 rounded-lg shadow hover:bg-[#33FBB1] transition duration-300 font-medium text-lg">
+          <button className="mb-8 bg-[#00FA9A] text-[#001a2c] px-6 py-3 rounded-lg shadow hover:bg-[#33FBB1] transition duration-300 font-medium text-lg">
             Criar Curso
           </button>
         </Link>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {loading ? (
             Array.from({ length: 6 }).map((_, index) => (
-              <div key={index} className="bg-[#003a66] h-48 rounded-lg animate-pulse"></div>
+              <div key={index} className="bg-white h-48 rounded-lg animate-pulse"></div>
             ))
           ) : (
             courses.map((course) => (
-              <div key={course.id} className="bg-[#003a66] rounded-lg shadow-lg p-6 transition-transform transform hover:scale-105 cursor-pointer relative">
+              <div key={course.id} className="bg-white rounded-lg shadow-lg p-6 transition-transform transform hover:scale-105 cursor-pointer relative">
                 <Link href={`/cursos/${course.id}`}>
-                  <h2 className="text-2xl font-semibold text-[#00FA9A] hover:underline mb-3">{course.title}</h2>
-                  <p className="text-[#b3e6cc] mt-2">{course.description}</p>
+                  <h2 className="text-2xl font-semibold text-[#001a2c] hover:underline mb-3">{course.title}</h2>
+                  <p className="text-[#003a66] mt-2">{course.description}</p>
                 </Link>
                 <button 
                   onClick={() => handleEdit(course)}
-                  className="absolute top-4 right-12 text-blue-400 hover:text-blue-600 focus:outline-none" 
+                  className="absolute top-4 right-12 text-[#001a2c] hover:text-[#00FA9A] focus:outline-none" 
                   aria-label="Editar curso"
                 >
                   <FaEdit size={20} />

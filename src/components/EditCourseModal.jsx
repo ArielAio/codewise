@@ -56,38 +56,39 @@ const EditCourseModal = ({ course, onClose, onRefresh }) => {
   }, []);
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div ref={modalRef} className="bg-white p-6 rounded-lg shadow-lg max-h-[90vh] overflow-y-auto">
-        <h2 className="text-xl font-bold mb-4">Editar Curso</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-gray-700">Título</label>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 overflow-y-auto">
+      <div ref={modalRef} className="bg-[#00264d] p-8 rounded-lg shadow-xl max-w-3xl w-full m-4">
+        <h2 className="text-3xl font-bold mb-6 text-[#00ffaa]">Editar Curso</h2>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="block text-[#00ffaa] text-lg font-semibold mb-2">Título</label>
             <input 
               type="text" 
               value={title} 
               onChange={(e) => setTitle(e.target.value)} 
-              className="border rounded w-full py-2 px-3" 
+              className="border border-[#00ffaa] bg-white rounded-lg w-full py-3 px-4 text-[#00264d] focus:outline-none focus:ring-2 focus:ring-[#00ffaa]" 
               required 
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Descrição</label>
+          <div>
+            <label className="block text-[#00ffaa] text-lg font-semibold mb-2">Descrição</label>
             <textarea 
               value={description} 
               onChange={(e) => setDescription(e.target.value)} 
-              className="border rounded w-full py-2 px-3" 
+              className="border border-[#00ffaa] bg-white rounded-lg w-full py-3 px-4 text-[#00264d] focus:outline-none focus:ring-2 focus:ring-[#00ffaa]" 
+              rows="4"
               required 
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-lg mb-2">Adicionar Aula</label>
+          <div>
+            <label className="block text-xl font-semibold mb-4 text-[#00ffaa]">Aulas</label>
             {youtubeLinks.map((link, index) => (
-              <div key={index} className="flex mb-2">
+              <div key={index} className="flex mb-3">
                 <input
                   type="text"
                   value={link.title}
                   onChange={(e) => handleLinkChange(index, 'title', e.target.value)}
-                  className="w-1/2 p-2 border border-gray-300 rounded mr-2"
+                  className="w-1/2 p-3 border border-[#00ffaa] bg-white rounded-lg mr-2 text-[#00264d] focus:outline-none focus:ring-2 focus:ring-[#00ffaa]"
                   placeholder="Título da Aula"
                   required
                 />
@@ -95,24 +96,26 @@ const EditCourseModal = ({ course, onClose, onRefresh }) => {
                   type="url"
                   value={link.url}
                   onChange={(e) => handleLinkChange(index, 'url', e.target.value)}
-                  className="w-1/2 p-2 border border-gray-300 rounded"
+                  className="w-1/2 p-3 border border-[#00ffaa] bg-white rounded-lg text-[#00264d] focus:outline-none focus:ring-2 focus:ring-[#00ffaa]"
                   placeholder="Link do YouTube"
                   required
                 />
                 {index > 0 && (
-                  <button type="button" onClick={() => removeLinkField(index)} className="text-red-600 ml-2 flex items-center">
+                  <button type="button" onClick={() => removeLinkField(index)} className="text-red-400 ml-2 flex items-center hover:text-red-300 transition-colors">
                     <FaTrash className="h-5 w-5 mr-1" />
                     Remover
                   </button>
                 )}
               </div>
             ))}
-            <button type="button" onClick={addLinkField} className="text-blue-600">
-              Adicionar Outro Link
+            <button type="button" onClick={addLinkField} className="text-[#00ffaa] font-semibold hover:text-[#33ffbb] transition-colors text-lg">
+              + Adicionar Nova Aula
             </button>
           </div>
-          <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Salvar</button>
-          <button type="button" onClick={onClose} className="ml-2 bg-gray-300 text-black px-4 py-2 rounded">Cancelar</button>
+          <div className="flex justify-end space-x-4 mt-8">
+            <button type="button" onClick={onClose} className="px-6 py-3 border border-[#00ffaa] rounded-lg text-[#00ffaa] font-semibold hover:bg-[#004d99] transition-colors">Cancelar</button>
+            <button type="submit" className="px-6 py-3 bg-[#00ffaa] text-[#00264d] rounded-lg font-semibold hover:bg-[#33ffbb] transition-colors">Salvar Alterações</button>
+          </div>
         </form>
       </div>
     </div>
