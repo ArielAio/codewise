@@ -1,42 +1,50 @@
 import { useEffect, useState } from 'react';
-import { db } from '../lib/firebaseConfig'; // Importar a configuração do Firebase
-import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore'; // Importar funções do Firestore
-import Link from 'next/link'; // Importar o componente Link do Next.js
-import { FaTrash } from 'react-icons/fa'; // Importar o ícone de lixeira
+import { db } from '../lib/firebaseConfig';
+import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import Link from 'next/link';
+import { FaTrash, FaEdit } from 'react-icons/fa';
+import EditCourseModal from './EditCourseModal';
 
 const CourseList = () => {
-  const [courses, setCourses] = useState([]); // Estado para armazenar os cursos
-  const [loading, setLoading] = useState(true); // Estado para controlar o carregamento
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentCourse, setCurrentCourse] = useState(null);
+
+  const fetchCourses = async () => {
+    try {
+      const coursesCollection = collection(db, 'cursos');
+      const coursesSnapshot = await getDocs(coursesCollection);
+      const coursesList = coursesSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setCourses(coursesList);
+    } catch (error) {
+      console.error('Erro ao buscar cursos:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const coursesCollection = collection(db, 'cursos'); // Nome da coleção no Firestore
-        const coursesSnapshot = await getDocs(coursesCollection);
-        const coursesList = coursesSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setCourses(coursesList); // Atualiza o estado com a lista de cursos
-      } catch (error) {
-        console.error('Erro ao buscar cursos:', error);
-      } finally {
-        setLoading(false); // Define loading como false após a busca
-      }
-    };
-
-    fetchCourses(); // Chama a função para buscar os cursos
-  }, []); // O array vazio significa que o efeito será executado apenas uma vez após a montagem do componente
+    fetchCourses();
+  }, []);
 
   const handleDelete = async (id) => {
     try {
-      const courseDoc = doc(db, 'cursos', id); // Referência ao documento do curso
-      await deleteDoc(courseDoc); // Exclui o documento do Firestore
-      setCourses(courses.filter(course => course.id !== id)); // Atualiza a lista de cursos localmente
+      const courseDoc = doc(db, 'cursos', id);
+      await deleteDoc(courseDoc);
+      setCourses(courses.filter(course => course.id !== id));
       console.log('Curso excluído:', id);
     } catch (error) {
       console.error('Erro ao excluir curso:', error);
     }
+  };
+
+  const handleEdit = (course) => {
+    setCurrentCourse(course);
+    setIsModalOpen(true);
   };
 
   return (
@@ -48,8 +56,8 @@ const CourseList = () => {
         </button>
       </Link>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {loading ? ( // Verifica se está carregando
-          Array.from({ length: 6 }).map((_, index) => ( // Gera 6 skeletons
+        {loading ? (
+          Array.from({ length: 6 }).map((_, index) => (
             <div key={index} className="bg-gray-300 h-32 rounded-lg animate-pulse"></div>
           ))
         ) : (
@@ -59,6 +67,13 @@ const CourseList = () => {
                 <h2 className="text-xl font-semibold text-blue-600 hover:underline">{course.title}</h2>
                 <p className="text-gray-700 mt-2">{course.description}</p>
               </Link>
+              <button 
+                onClick={() => handleEdit(course)}
+                className="absolute top-4 right-16 text-blue-500 hover:text-blue-700 focus:outline-none" 
+                aria-label="Editar curso"
+              >
+                <FaEdit size={20} />
+              </button>
               <button 
                 onClick={() => handleDelete(course.id)} 
                 className="absolute top-4 right-4 text-red-500 hover:text-red-700 focus:outline-none" 
@@ -70,6 +85,13 @@ const CourseList = () => {
           ))
         )}
       </div>
+      {isModalOpen && (
+        <EditCourseModal 
+          course={currentCourse} 
+          onClose={() => setIsModalOpen(false)}
+          onRefresh={fetchCourses}
+        />
+      )}
     </div>
   );
 };

@@ -53,6 +53,7 @@ export default function Header() {
           <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
             <nav ref={menuRef} className="absolute top-16 right-4 bg-[#001a33] shadow-lg rounded-md px-6 py-4 flex flex-col space-y-4 items-center">
               <Link href="/" className="text-[#00FA9A] hover:text-[#33FBB1] font-medium" onClick={handleLinkClick}>
+
                 Início
               </Link>
               <Link href="/cursos" className="text-[#00FA9A] hover:text-[#33FBB1] font-medium" onClick={handleLinkClick}>

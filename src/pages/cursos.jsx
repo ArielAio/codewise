@@ -1,5 +1,5 @@
-import Head from 'next/head'; // Importar o componente Head do Next.js
-import CourseList from '../components/CourseList'; // Importar o componente CourseList
+import Head from 'next/head';
+import CourseList from '../components/CourseList';
 
 export default function Cursos() {
   return (
@@ -26,6 +26,7 @@ export default function Cursos() {
             Fale Conosco
           </a>
         </section>
+
       </main>
 
       <footer className="text-center py-8 bg-[#001a33] text-white mt-16">
