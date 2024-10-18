@@ -85,9 +85,7 @@ const CourseDetail = ({ course }) => {
                   allowFullScreen
                   className="rounded-lg shadow-lg"
                 ></iframe>
-                <button onClick={handleNextVideo} className="mt-4 bg-[#00FA9A] hover:bg-opacity-80 text-[#001a33] font-bold px-6 py-2 rounded transition duration-300">
-                  Próximo Vídeo
-                </button>
+                {/* Removido o botão "Próximo Vídeo" */}
               </div>
             ) : (
               <p className="text-white">Selecione uma aula para assistir.</p>
