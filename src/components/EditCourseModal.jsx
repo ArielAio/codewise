@@ -57,7 +57,7 @@ const EditCourseModal = ({ course, onClose, onRefresh }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 overflow-y-auto">
-      <div ref={modalRef} className="bg-[#00264d] p-8 rounded-lg shadow-xl max-w-3xl w-full m-4">
+      <div ref={modalRef} className="bg-[#00264d] p-8 rounded-lg shadow-xl max-w-3xl w-full m-4 overflow-y-auto max-h-[80vh]">
         <h2 className="text-3xl font-bold mb-6 text-[#00ffaa]">Editar Curso</h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
