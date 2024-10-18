@@ -117,6 +117,32 @@ const EditCourseModal = ({ course, onClose, onRefresh }) => {
             <button type="submit" className="px-6 py-3 bg-[#00ffaa] text-[#00264d] rounded-lg font-semibold hover:bg-[#33ffbb] transition-colors">Salvar Alterações</button>
           </div>
         </form>
+        {/* Pré-visualização do curso */}
+        <div className="mt-8 p-4 bg-[#003366] rounded-lg text-white">
+          <h3 className="text-2xl font-bold mb-2">Pré-visualização</h3>
+          <p className="mb-2"><strong>Título:</strong> {title}</p>
+          <p className="mb-2"><strong>Descrição:</strong> {description}</p>
+          <h4 className="font-semibold">Links do YouTube:</h4>
+          <ul className="list-disc pl-5">
+            {youtubeLinks.map((link, index) => (
+              <li key={index} className="mb-2">
+                <strong>{link.title}</strong>: 
+                <a href={link.url} className="text-[#00ffaa]" target="_blank" rel="noopener noreferrer">{link.url}</a>
+                {/* Adicionando o iframe para pré-visualização do vídeo */}
+                <iframe 
+                  width="100%" 
+                  height="200" 
+                  src={`https://www.youtube.com/embed/${link.url.split('v=')[1]?.split('&')[0]}`} 
+                  title={link.title} 
+                  frameBorder="0" 
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                  allowFullScreen 
+                  className="mt-2"
+                ></iframe>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   );

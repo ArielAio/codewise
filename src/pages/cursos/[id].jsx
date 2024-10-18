@@ -78,10 +78,10 @@ const CourseDetail = ({ course }) => {
                 <iframe
                   width="100%"
                   height="450"
-                  src={`https://www.youtube.com/embed/${selectedVideo}`}
+                  src={`https://www.youtube.com/embed/${selectedVideo}?autoplay=1`}
                   title="YouTube video player"
                   frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                   allowFullScreen
                   className="rounded-lg shadow-lg"
                 ></iframe>
