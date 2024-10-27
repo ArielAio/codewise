@@ -4,6 +4,7 @@ import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Skeleton from 'react-loading-skeleton';
+import { motion } from 'framer-motion'; // Importando a biblioteca framer-motion
 
 const CourseDetail = ({ course }) => {
   const router = useRouter();
@@ -12,45 +13,60 @@ const CourseDetail = ({ course }) => {
   const [watchedVideos, setWatchedVideos] = useState({});
 
   useEffect(() => {
-    if (course && course.youtubeLinks && course.youtubeLinks.length > 0) {
+    // Recupera o progresso do usuário do localStorage
+    const savedProgress = localStorage.getItem(`watchedVideos_${id}`);
+    if (savedProgress) {
+      setWatchedVideos(JSON.parse(savedProgress));
+    }
+
+    // Recupera o vídeo selecionado do localStorage
+    const savedVideoIndex = localStorage.getItem(`selectedVideo_${id}`);
+    if (savedVideoIndex) {
+      const videoIndex = parseInt(savedVideoIndex, 10);
+      if (course.youtubeLinks && course.youtubeLinks[videoIndex]) {
+        setSelectedVideo(new URL(course.youtubeLinks[videoIndex].url).searchParams.get('v'));
+      }
+    } else if (course && course.youtubeLinks && course.youtubeLinks.length > 0) {
       setSelectedVideo(new URL(course.youtubeLinks[0].url).searchParams.get('v'));
     }
-  }, [course]);
+  }, [id, course]);
 
-  if (!course)
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 text-blue-900">
-        <Skeleton height={50} count={3} />
-      </div>
-    );
+  const updateLocalProgress = (index) => {
+    const updatedWatchedVideos = { ...watchedVideos, [index]: true };
+    setWatchedVideos(updatedWatchedVideos);
+    localStorage.setItem(`watchedVideos_${id}`, JSON.stringify(updatedWatchedVideos)); // Salva no localStorage
+  };
 
-    const handleVideoClick = (url, index, event) => {
-        event.stopPropagation();
-        const currentIndex = course.youtubeLinks.findIndex(link => link.url.includes(selectedVideo));
-        if (currentIndex !== -1) {
-          setWatchedVideos((prev) => ({
-            ...prev,
-            [currentIndex]: true,
-          }));
-        }
-        setSelectedVideo(new URL(url).searchParams.get('v'));
-      };
-      
-      const handleCheckboxToggle = (index, event) => {
-        event.stopPropagation();
-        setWatchedVideos((prev) => ({
-          ...prev,
-          [index]: !prev[index],
-        }));
-      };
-      
-      const handleNextVideo = () => {
-        const currentIndex = course.youtubeLinks.findIndex(link => link.url.includes(selectedVideo));
-        if (currentIndex < course.youtubeLinks.length - 1) {
-          handleVideoClick(course.youtubeLinks[currentIndex + 1].url, currentIndex + 1);
-        }
-      };
-      
+  const handleVideoClick = (url, index, event) => {
+    event.stopPropagation();
+    const currentIndex = course.youtubeLinks.findIndex(link => link.url.includes(selectedVideo));
+    if (currentIndex !== -1) {
+      updateLocalProgress(currentIndex); // Atualiza o progresso localmente
+    }
+    setSelectedVideo(new URL(url).searchParams.get('v'));
+    localStorage.setItem(`selectedVideo_${id}`, index); // Salva o índice do vídeo selecionado
+  };
+  
+  const handleCheckboxToggle = (index, event) => {
+    event.stopPropagation();
+    setWatchedVideos((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
+  
+  const handleNextVideo = () => {
+    const currentIndex = course.youtubeLinks.findIndex(link => link.url.includes(selectedVideo));
+    if (currentIndex < course.youtubeLinks.length - 1) {
+      handleVideoClick(course.youtubeLinks[currentIndex + 1].url, currentIndex + 1);
+    }
+  };
+  
+
+  // Cálculo da porcentagem de vídeos assistidos
+  const totalVideos = course.youtubeLinks.length;
+  const completedVideos = Object.keys(watchedVideos).filter(key => watchedVideos[key]).length;
+  const progressPercentage = totalVideos > 0 ? (completedVideos / totalVideos) * 100 : 0;
 
   return (
     <div className="min-h-screen bg-white text-[#001a33]">
@@ -83,7 +99,7 @@ const CourseDetail = ({ course }) => {
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                   allowFullScreen
-                  className="rounded-lg shadow-lg"
+                  className="rounded-lg shadow-lg border-2 border-[#00FA9A]" // Alterada para borda mais fina
                 ></iframe>
                 {/* Removido o botão "Próximo Vídeo" */}
               </div>
@@ -98,34 +114,48 @@ const CourseDetail = ({ course }) => {
             {course.youtubeLinks && course.youtubeLinks.length > 0 ? (
               <ul className="space-y-4">
                 {course.youtubeLinks.map((link, index) => (
-                  <li
+                  <motion.li // Mudei para motion.li para adicionar animações
                     key={index}
                     className={`bg-[#001a33] shadow-lg p-4 rounded-lg hover:bg-opacity-80 transition-colors cursor-pointer flex items-center justify-between ${
                       selectedVideo === new URL(link.url).searchParams.get('v') ? 'border-2 border-[#00FA9A]' : ''
                     }`}
+                    onClick={(event) => handleVideoClick(link.url, index, event)} // Mover o onClick para o li
+                    whileTap={{ scale: 0.95 }} // Animação ao clicar
+                    whileHover={{ scale: 1.02 }} // Animação ao passar o mouse
                   >
-                    <button
-                      onClick={(event) => handleVideoClick(link.url, index, event)}
-                      className="text-lg font-bold text-white w-full text-left"
-                    >
+                    <div className="text-lg font-bold text-white w-full flex items-center justify-between">
                       {link.title}
-                    </button>
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={watchedVideos[index] || false}
-                        onChange={(event) => handleCheckboxToggle(index, event)}
-                        className="ml-4 w-6 h-6 accent-[#00FA9A]"
-                        onClick={(event) => event.stopPropagation()}
-                      />
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={watchedVideos[index] || false}
+                          onChange={(event) => handleCheckboxToggle(index, event)}
+                          className="ml-4 w-6 h-6 accent-[#00FA9A]"
+                          onClick={(event) => event.stopPropagation()}
+                        />
+                      </div>
                     </div>
-                  </li>
+                  </motion.li>
                 ))}
               </ul>
             ) : (
               <p className="text-white">Não há links de aulas disponíveis para este curso.</p>
             )}
           </aside>
+        </div>
+
+        {/* Barra de Progresso */}
+        <div className="mt-12">
+          <h3 className="text-2xl font-semibold mb-4 text-[#00FA9A]">Progresso do Curso</h3>
+          <div className="bg-gray-200 rounded-full h-4">
+            <div
+              className="bg-[#00FA9A] h-4 rounded-full transition-all duration-500" // Adicionada a transição
+              style={{ width: `${progressPercentage}%` }}
+            ></div>
+          </div>
+          <p className="text-center text-[#001a33] mt-2">
+            {completedVideos} de {totalVideos} aulas concluídas ({progressPercentage.toFixed(0)}%)
+          </p>
         </div>
       </main>
     </div>

@@ -4,6 +4,7 @@ import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import Link from 'next/link';
 import { FaTrash, FaEdit } from 'react-icons/fa';
 import EditCourseModal from './EditCourseModal';
+import { motion } from 'framer-motion'; // Importando a biblioteca de animação
 
 const CourseList = () => {
   const [courses, setCourses] = useState([]);
@@ -53,9 +54,13 @@ const CourseList = () => {
         <h1 className="text-4xl font-bold mb-4 text-center text-[#00FA9A]">Lista de Cursos</h1>
         <p className="text-center text-white mb-8">Explore nossa seleção de cursos e comece sua jornada de aprendizado</p>
         <Link href="/criar-curso">
-          <button className="mb-8 bg-[#00FA9A] text-[#001a2c] px-6 py-3 rounded-lg shadow hover:bg-[#33FBB1] transition duration-300 font-medium text-lg">
+          <motion.button // Alterado para motion.button
+            className="mb-8 bg-[#00FA9A] text-[#001a2c] px-6 py-3 rounded-lg shadow hover:bg-[#33FBB1] transition duration-300 font-medium text-lg"
+            whileHover={{ scale: 1.05, transition: { duration: 0 } }} // Aumenta instantaneamente ao passar o mouse
+            whileTap={{ scale: 0.95, transition: { duration: 0 } }} // Diminui instantaneamente ao clicar
+          >
             Criar Curso
-          </button>
+          </motion.button>
         </Link>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {loading ? (
@@ -64,7 +69,11 @@ const CourseList = () => {
             ))
           ) : (
             courses.map((course) => (
-              <div key={course.id} className="bg-white rounded-lg shadow-lg p-6 transition-transform transform hover:scale-105 cursor-pointer relative">
+              <motion.div // Alterado para motion.div
+                key={course.id}
+                className="bg-white rounded-lg shadow-lg p-6 transition-transform transform hover:scale-105 cursor-pointer relative"
+                whileTap={{ scale: 0.95, transition: { duration: 0.1 } }} // Animação de clique mais rápida
+              >
                 <Link href={`/cursos/${course.id}`}>
                   <h2 className="text-2xl font-semibold text-[#001a2c] hover:underline mb-3">{course.title}</h2>
                   <p className="text-[#003a66] mt-2">{course.description}</p>
@@ -83,7 +92,7 @@ const CourseList = () => {
                 >
                   <FaTrash size={20} />
                 </button>
-              </div>
+              </motion.div>
             ))
           )}
         </div>

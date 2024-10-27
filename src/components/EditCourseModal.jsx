@@ -3,6 +3,16 @@ import { db } from '../lib/firebaseConfig';
 import { doc, updateDoc } from 'firebase/firestore';
 import { FaTrash } from 'react-icons/fa';
 
+const isValidYouTubeUrl = (url) => {
+  const regex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/;
+  return regex.test(url);
+};
+
+const getYouTubeEmbedUrl = (url) => {
+  const videoId = url.split('v=')[1]?.split('&')[0];
+  return `https://www.youtube.com/embed/${videoId}`;
+};
+
 const EditCourseModal = ({ course, onClose, onRefresh }) => {
   const [title, setTitle] = useState(course.title);
   const [description, setDescription] = useState(course.description);
@@ -83,25 +93,40 @@ const EditCourseModal = ({ course, onClose, onRefresh }) => {
           <div>
             <label className="block text-xl font-semibold mb-4 text-[#00ffaa]">Aulas</label>
             {youtubeLinks.map((link, index) => (
-              <div key={index} className="flex mb-3">
-                <input
-                  type="text"
-                  value={link.title}
-                  onChange={(e) => handleLinkChange(index, 'title', e.target.value)}
-                  className="w-1/2 p-3 border border-[#00ffaa] bg-white rounded-lg mr-2 text-[#00264d] focus:outline-none focus:ring-2 focus:ring-[#00ffaa]"
-                  placeholder="Título da Aula"
-                  required
-                />
-                <input
-                  type="url"
-                  value={link.url}
-                  onChange={(e) => handleLinkChange(index, 'url', e.target.value)}
-                  className="w-1/2 p-3 border border-[#00ffaa] bg-white rounded-lg text-[#00264d] focus:outline-none focus:ring-2 focus:ring-[#00ffaa]"
-                  placeholder="Link do YouTube"
-                  required
-                />
+              <div key={index} className="mb-6">
+                <div className="flex space-x-4 mb-2">
+                  <input
+                    type="text"
+                    value={link.title}
+                    onChange={(e) => handleLinkChange(index, 'title', e.target.value)}
+                    className="w-1/2 p-3 border border-[#00ffaa] bg-white rounded-lg text-[#00264d] focus:outline-none focus:ring-2 focus:ring-[#00ffaa]"
+                    placeholder="Título da Aula"
+                    required
+                  />
+                  <input
+                    type="url"
+                    value={link.url}
+                    onChange={(e) => handleLinkChange(index, 'url', e.target.value)}
+                    className="w-1/2 p-3 border border-[#00ffaa] bg-white rounded-lg text-[#00264d] focus:outline-none focus:ring-2 focus:ring-[#00ffaa]"
+                    placeholder="Link do YouTube"
+                    required
+                  />
+                </div>
+                {/* Pré-visualização do vídeo abaixo do link */}
+                {isValidYouTubeUrl(link.url) && (
+                  <iframe 
+                    width="100%" 
+                    height="200" 
+                    src={getYouTubeEmbedUrl(link.url)} 
+                    title={link.title} 
+                    frameBorder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowFullScreen 
+                    className="mt-4"
+                  ></iframe>
+                )}
                 {index > 0 && (
-                  <button type="button" onClick={() => removeLinkField(index)} className="text-red-400 ml-2 flex items-center hover:text-red-300 transition-colors">
+                  <button type="button" onClick={() => removeLinkField(index)} className="text-red-400 mt-2 flex items-center hover:text-red-300 transition-colors">
                     <FaTrash className="h-5 w-5 mr-1" />
                     Remover
                   </button>
@@ -117,32 +142,6 @@ const EditCourseModal = ({ course, onClose, onRefresh }) => {
             <button type="submit" className="px-6 py-3 bg-[#00ffaa] text-[#00264d] rounded-lg font-semibold hover:bg-[#33ffbb] transition-colors">Salvar Alterações</button>
           </div>
         </form>
-        {/* Pré-visualização do curso */}
-        <div className="mt-8 p-4 bg-[#003366] rounded-lg text-white">
-          <h3 className="text-2xl font-bold mb-2">Pré-visualização</h3>
-          <p className="mb-2"><strong>Título:</strong> {title}</p>
-          <p className="mb-2"><strong>Descrição:</strong> {description}</p>
-          <h4 className="font-semibold">Links do YouTube:</h4>
-          <ul className="list-disc pl-5">
-            {youtubeLinks.map((link, index) => (
-              <li key={index} className="mb-2">
-                <strong>{link.title}</strong>: 
-                <a href={link.url} className="text-[#00ffaa]" target="_blank" rel="noopener noreferrer">{link.url}</a>
-                {/* Adicionando o iframe para pré-visualização do vídeo */}
-                <iframe 
-                  width="100%" 
-                  height="200" 
-                  src={`https://www.youtube.com/embed/${link.url.split('v=')[1]?.split('&')[0]}`} 
-                  title={link.title} 
-                  frameBorder="0" 
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                  allowFullScreen 
-                  className="mt-2"
-                ></iframe>
-              </li>
-            ))}
-          </ul>
-        </div>
       </div>
     </div>
   );
