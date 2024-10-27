@@ -68,6 +68,11 @@ const CourseDetail = ({ course }) => {
   const completedVideos = Object.keys(watchedVideos).filter(key => watchedVideos[key]).length;
   const progressPercentage = totalVideos > 0 ? (completedVideos / totalVideos) * 100 : 0;
 
+  // Adicionando verificação para course
+  if (!course || !course.youtubeLinks) {
+    return <p className="text-center text-red-500">Curso não encontrado ou sem aulas disponíveis.</p>; // Mensagem de erro
+  }
+
   return (
     <div className="min-h-screen bg-white text-[#001a33]">
       <Head>
@@ -176,6 +181,13 @@ export async function getStaticProps({ params }) {
   const courseDoc = doc(db, 'cursos', params.id);
   const courseSnapshot = await getDoc(courseDoc);
   const courseData = courseSnapshot.exists() ? courseSnapshot.data() : null;
+
+  // Adicionando verificação para courseData
+  if (!courseData) {
+    return {
+      notFound: true, // Retorna uma página 404 se o curso não for encontrado
+    };
+  }
 
   return {
     props: {
