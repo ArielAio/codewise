@@ -38,7 +38,9 @@ const CourseDetail = ({ course }) => {
   };
 
   const handleVideoClick = (url, index, event) => {
-    event.stopPropagation();
+    if (event) { // Verifica se o evento está definido
+      event.stopPropagation();
+    }
     const currentIndex = course.youtubeLinks.findIndex(link => link.url.includes(selectedVideo));
     if (currentIndex !== -1) {
       updateLocalProgress(currentIndex); // Atualiza o progresso localmente
@@ -64,14 +66,13 @@ const CourseDetail = ({ course }) => {
   
 
   // Cálculo da porcentagem de vídeos assistidos
+  if (!course || !course.youtubeLinks) { // Verifica se course e youtubeLinks estão definidos
+    return <p className="text-center text-red-500">Curso não encontrado ou sem aulas disponíveis.</p>; // Mensagem de erro
+  }
+  
   const totalVideos = course.youtubeLinks.length;
   const completedVideos = Object.keys(watchedVideos).filter(key => watchedVideos[key]).length;
   const progressPercentage = totalVideos > 0 ? (completedVideos / totalVideos) * 100 : 0;
-
-  // Adicionando verificação para course
-  if (!course || !course.youtubeLinks) {
-    return <p className="text-center text-red-500">Curso não encontrado ou sem aulas disponíveis.</p>; // Mensagem de erro
-  }
 
   return (
     <div className="min-h-screen bg-white text-[#001a33]">
@@ -104,9 +105,16 @@ const CourseDetail = ({ course }) => {
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                   allowFullScreen
-                  className="rounded-lg shadow-lg border-2 border-[#00FA9A]" // Alterada para borda mais fina
+                  className="rounded-lg shadow-lg border-2 border-[#00FA9A]"
                 ></iframe>
-                {/* Removido o botão "Próximo Vídeo" */}
+                {course.youtubeLinks.findIndex(link => link.url.includes(selectedVideo)) < course.youtubeLinks.length - 1 && ( // Verifica se há próximo vídeo
+                  <button 
+                    onClick={handleNextVideo} 
+                    className="mt-4 bg-[#00FA9A] text-white py-2 px-4 rounded hover:bg-[#00FA7A]"
+                  >
+                    Próximo Vídeo
+                  </button>
+                )}
               </div>
             ) : (
               <p className="text-white">Selecione uma aula para assistir.</p>
@@ -119,14 +127,14 @@ const CourseDetail = ({ course }) => {
             {course.youtubeLinks && course.youtubeLinks.length > 0 ? (
               <ul className="space-y-4">
                 {course.youtubeLinks.map((link, index) => (
-                  <motion.li // Mudei para motion.li para adicionar animações
+                  <motion.li
                     key={index}
                     className={`bg-[#001a33] shadow-lg p-4 rounded-lg hover:bg-opacity-80 transition-colors cursor-pointer flex items-center justify-between ${
                       selectedVideo === new URL(link.url).searchParams.get('v') ? 'border-2 border-[#00FA9A]' : ''
                     }`}
-                    onClick={(event) => handleVideoClick(link.url, index, event)} // Mover o onClick para o li
-                    whileTap={{ scale: 0.95 }} // Animação ao clicar
-                    whileHover={{ scale: 1.02 }} // Animação ao passar o mouse
+                    onClick={(event) => handleVideoClick(link.url, index, event)}
+                    whileTap={{ scale: 0.95 }}
+                    whileHover={{ scale: 1.02 }}
                   >
                     <div className="text-lg font-bold text-white w-full flex items-center justify-between">
                       {link.title}
@@ -154,7 +162,7 @@ const CourseDetail = ({ course }) => {
           <h3 className="text-2xl font-semibold mb-4 text-[#00FA9A]">Progresso do Curso</h3>
           <div className="bg-gray-200 rounded-full h-4">
             <div
-              className="bg-[#00FA9A] h-4 rounded-full transition-all duration-500" // Adicionada a transição
+              className="bg-[#00FA9A] h-4 rounded-full transition-all duration-500"
               style={{ width: `${progressPercentage}%` }}
             ></div>
           </div>
@@ -183,7 +191,7 @@ export async function getStaticProps({ params }) {
   const courseData = courseSnapshot.exists() ? courseSnapshot.data() : null;
 
   // Adicionando verificação para courseData
-  if (!courseData) {
+  if (!courseData || !courseData.youtubeLinks || !Array.isArray(courseData.youtubeLinks)) { // Verifique se youtubeLinks existe e é um array
     return {
       notFound: true, // Retorna uma página 404 se o curso não for encontrado
     };
