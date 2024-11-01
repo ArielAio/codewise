@@ -1,36 +1,29 @@
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
+import { useAuth } from '../lib/AuthContext';
+import { useRouter } from 'next/router';
 
 export default function Header() {
+  const { user, signOut } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const menuRef = useRef(null);
+  const router = useRouter();
 
-  const handleMouseEnter = () => {
-    setIsHovering(true);
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovering(false);
-  };
-
+  const handleMouseEnter = () => setIsHovering(true);
+  const handleMouseLeave = () => setIsHovering(false);
   const handleClick = (e) => {
     e.stopPropagation();
     setIsMenuOpen(!isMenuOpen);
   };
 
-  const handleMenuItemClick = (e) => {
-    e.stopPropagation();
-    setIsMenuOpen(false);
-
-    const target = e.currentTarget;
-    if (target) {
-      target.classList.add('scale-95');
-      setTimeout(() => {
-        if (target) {
-          target.classList.remove('scale-95');
-        }
-      }, 100);
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      setIsMenuOpen(false);
+      router.push('/login');
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
     }
   };
 
@@ -40,12 +33,14 @@ export default function Header() {
         setIsMenuOpen(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Evitar renderizar o Header se a rota for /login ou /register
+  if (router.pathname === '/login' || router.pathname === '/register') {
+    return null;
+  }
 
   const showMenu = isMenuOpen || isHovering;
 
@@ -53,11 +48,11 @@ export default function Header() {
     <header className="bg-[#001a33] shadow-md relative z-10">
       <div className="container mx-auto px-4 py-6 flex justify-between items-center">
         <Link href="/" className="text-3xl font-bold text-[#00FA9A]">
-          {/* Substitua o texto pelo logo da imagem */}
           <div className="flex items-center space-x-2">
-            <img src="/icon-logo.png" alt="CodeWise Icon Logo" className="h-10 w-auto" /> {/* Icon logo */}
-            <img src="/name-logo.png" alt="CodeWise Name Logo" className="h-10 w-auto" /> {/* Name logo */}
-          </div>        </Link>
+            <img src="/icon-logo.png" alt="CodeWise Icon Logo" className="h-10 w-auto" />
+            <img src="/name-logo.png" alt="CodeWise Name Logo" className="h-10 w-auto" />
+          </div>
+        </Link>
         <nav className="flex items-center space-x-6">
           <div
             className="relative"
@@ -66,7 +61,9 @@ export default function Header() {
             onMouseLeave={handleMouseLeave}
           >
             <button
-              className={`text-[#00FA9A] hover:text-[#33FBB1] font-medium text-2xl transition-transform duration-200 ${isMenuOpen ? 'scale-110' : 'scale-100'}`}
+              className={`text-[#00FA9A] hover:text-[#33FBB1] font-medium text-2xl transition-transform duration-200 ${
+                isMenuOpen ? 'scale-110' : 'scale-100'
+              }`}
               aria-label="Menu"
               onClick={handleClick}
             >
@@ -74,22 +71,56 @@ export default function Header() {
             </button>
             {showMenu && (
               <div className="absolute right-0 mt-2 w-48 bg-[#002b4d] rounded-lg shadow-xl py-2 z-20">
-                <Link href="/" className="block px-4 py-2 text-[#00FA9A] hover:bg-[#003a66] flex items-center transition-transform duration-200 transform" onClick={handleMenuItemClick}>
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                  </svg>
-                  Início
-                </Link>
-                <Link href="/cursos" className="block px-4 py-2 text-[#00FA9A] hover:bg-[#003a66] flex items-center transition-transform duration-200 transform" onClick={handleMenuItemClick}>
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  Cursos
-                </Link>
-                <Link href="/criar-curso" className="block px-4 py-2 text-[#00FA9A] hover:bg-[#003a66] flex items-center transition-transform duration-200 transform" onClick={handleMenuItemClick}>
-                  <span className="font-bold text-xl mr-2">+</span>
-                  Criar Curso
-                </Link>
+                {user ? (
+                  <>
+                    <Link
+                      href="/"
+                      className="block px-4 py-2 text-[#00FA9A] hover:bg-[#003a66] flex items-center transition-transform duration-200 transform"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Início
+                    </Link>
+                    <Link
+                      href={user?.permission === 'admin' ? '/admin/cursos' : '/cursos'}
+                      className="block px-4 py-2 text-[#00FA9A] hover:bg-[#003a66] flex items-center transition-transform duration-200 transform"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Cursos
+                    </Link>
+                    {user?.permission === 'admin' && (
+                      <Link
+                        href="/criar-curso"
+                        className="block px-4 py-2 text-[#00FA9A] hover:bg-[#003a66] flex items-center transition-transform duration-200 transform"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Criar Curso
+                      </Link>
+                    )}
+                    <button
+                      onClick={handleSignOut}
+                      className="block px-4 py-2 text-red-500 hover:bg-[#003a66] flex items-center transition-transform duration-200 transform"
+                    >
+                      Sair
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      className="block px-4 py-2 text-[#00FA9A] hover:bg-[#003a66] flex items-center transition-transform duration-200 transform"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Entrar
+                    </Link>
+                    <Link
+                      href="/register"
+                      className="block px-4 py-2 text-[#00FA9A] hover:bg-[#003a66] flex items-center transition-transform duration-200 transform"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Cadastrar
+                    </Link>
+                  </>
+                )}
               </div>
             )}
           </div>

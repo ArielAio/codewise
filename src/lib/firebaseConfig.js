@@ -1,8 +1,7 @@
 // src/firebase.js
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore'; // Para Firestore
-// ou
-// import { getDatabase } from 'firebase/database'; // Para Realtime Database
+import { getAuth } from 'firebase/auth'; // Importando o módulo de autenticação
 
 // Sua configuração do Firebase
 const firebaseConfig = {
@@ -22,5 +21,7 @@ const db = getFirestore(app); // Para Firestore
 // ou
 // const db = getDatabase(app); // Para Realtime Database
 
-export { db };
+// Inicializa o Auth
+const auth = getAuth(app); // Inicializa a autenticação
 
+export { db, auth }; // Exporta o db e auth
