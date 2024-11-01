@@ -64,26 +64,19 @@ export default function Home() {
     return selectedEmoji;
   };
 
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 3000,
-  };
-
   return (
     <div className="min-h-screen bg-white text-[#001a33]">
       <Head>
         <title>CodeWise - Aprenda programação com tranquilidade</title>
-        <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className="container mx-auto px-4 py-8">
         <header className="text-center mb-16 bg-[#001a33] py-8 rounded-lg">
-          <h1 className="text-6xl font-bold mb-4 text-[#00FA9A] transition-transform duration-300 transform hover:scale-105">CodeWise</h1>
+          <div className="flex justify-center items-center flex-col">
+            <h1 className="text-5xl font-bold mb-4 text-[#00FA9A] transition-transform duration-300 transform hover:scale-105">
+              <img className="w-96 h-auto" src="/name-logo.png" alt="" />
+            </h1>
+          </div>
           <p className="text-xl text-white">Aprenda programação no seu ritmo, com serenidade e sabedoria</p>
         </header>
 
@@ -95,19 +88,24 @@ export default function Home() {
           ) : cursos.length > 0 ? (
             <div className="text-center mb-4">
               <div className="inline-block transition-all duration-500 ease-in-out transform hover:scale-110 cursor-pointer">
-                <span className="text-6xl mb-4 inline-block">
-                  {getRandomEmoji()}
-                </span>
-                <h3 className="text-2xl font-semibold text-[#001a33]">
+                <div className="flex flex-col items-center">
                   <Link href={`/cursos/${cursos[currentCourseIndex]?.id}`}>
-                    {cursos.length > 0 ? cursos[currentCourseIndex]?.title : 'Curso Indisponível'}
+                    <span className="text-6xl mb-2 inline-block">
+                      {getRandomEmoji()}
+                    </span>
                   </Link>
-                </h3>
+                  <h3 className="text-2xl font-semibold text-[#001a33]">
+                    <Link href={`/cursos/${cursos[currentCourseIndex]?.id}`}>
+                      {cursos.length > 0 ? cursos[currentCourseIndex]?.title : 'Curso Indisponível'}
+                    </Link>
+                  </h3>
+                </div>
               </div>
             </div>
           ) : (
             <p className="text-lg text-[#001a33]">Nenhum curso disponível no momento.</p>
           )}
+
         </section>
 
         <section className="text-center mb-16 bg-[#001a33] py-12 px-4 rounded-lg">
@@ -139,8 +137,8 @@ export default function Home() {
           <h2 className="text-3xl font-semibold mb-6 text-center text-[#00FA9A]">Depoimentos de Alunos</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {[
-              { name: 'Ana Silva', comment: 'A CodeWise mudou minha vida. O ambiente tranquilo de aprendizado me ajudou a focar e progredir rapidamente.' },
-              { name: 'Carlos Oliveira', comment: 'Os projetos práticos da CodeWise me deram confiança para iniciar minha carreira como desenvolvedor.' },
+              { name: 'Paulo Mazuque', comment: 'A CodeWise mudou minha vida. O ambiente tranquilo de aprendizado me ajudou a focar e progredir rapidamente.' },
+              { name: 'Pedro Colavite', comment: 'Os projetos práticos da CodeWise me deram confiança para iniciar minha carreira como desenvolvedor.' },
             ].map((testimonial, index) => (
               <div key={index} className="bg-white p-4 rounded-lg shadow-md">
                 <p className="italic mb-2 text-[#001a33]">"{testimonial.comment}"</p>
@@ -152,7 +150,7 @@ export default function Home() {
       </main>
 
       <footer className="text-center py-8 bg-[#001a33] text-white mt-16">
-        <p>&copy; 2023 CodeWise. Transformando vidas através da programação.</p>
+        <p>&copy; 2024 CodeWise. Transformando vidas através da programação.</p>
       </footer>
     </div>
   );

@@ -6,7 +6,6 @@ export default function Cursos() {
     <div className="min-h-screen bg-white text-[#001a33]">
       <Head>
         <title>Cursos - CodeWise</title>
-        <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className="container mx-auto px-4 py-8">
