@@ -3,11 +3,13 @@ import { db } from "../../lib/firebaseConfig";
 import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 import Head from "next/head";
 import AdminRoute from "../../components/AdminRoute";
-import LoadingSpinner from "../../components/LoadingSpinner";
+import LoadingSkeleton from "../../components/LoadingSkeleton"; // Importando o componente de loading skeleton
 
 const Feedbacks = () => {
   const [feedbacks, setFeedbacks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCourse, setSelectedCourse] = useState("");
 
   useEffect(() => {
     const fetchFeedbacks = async () => {
@@ -37,11 +39,34 @@ const Feedbacks = () => {
     }
   };
 
+  const filteredFeedbacks = feedbacks.filter(feedback => {
+    const matchesSearchTerm = feedback.userName.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCourse = selectedCourse ? feedback.courseName === selectedCourse : true;
+    return matchesSearchTerm && matchesCourse;
+  });
+
+  const uniqueCourses = [...new Set(feedbacks.map(feedback => feedback.courseName))];
+
   if (loading) {
-    return <LoadingSpinner />;
+    return (
+      <AdminRoute>
+        <div className="min-h-screen bg-white text-[#001a33]">
+          <main className="container mx-auto px-4 py-16">
+            <h2 className="text-4xl font-bold mb-8 text-center text-[#001a33]">
+              Feedbacks dos Cursos
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <LoadingSkeleton key={index} />
+              ))}
+            </div>
+          </main>
+        </div>
+      </AdminRoute>
+    );
   }
 
-  const groupedFeedbacks = feedbacks.reduce((acc, feedback) => {
+  const groupedFeedbacks = filteredFeedbacks.reduce((acc, feedback) => {
     if (!acc[feedback.courseId]) {
       acc[feedback.courseId] = [];
     }
@@ -60,46 +85,67 @@ const Feedbacks = () => {
           <h1 className="text-4xl font-bold mb-8 text-center text-[#001a33]">
             Feedbacks dos Cursos
           </h1>
-          {feedbacks.length === 0 ? (
-            <p className="text-center text-lg text-[#001a33]">
-              Nenhum feedback disponível no momento.
-            </p>
-          ) : (
-            Object.keys(groupedFeedbacks).map((courseId) => (
-              <div key={courseId} className="mb-8">
-                <h2 className="text-3xl font-semibold mb-4 text-[#00FA9A]">
-                  Curso: {groupedFeedbacks[courseId][0].courseName}
-                </h2>
-                <ul>
-                  {groupedFeedbacks[courseId].map((feedback, index) => (
-                    <li
-                      key={index}
-                      className="mb-4 p-4 bg-[#001a33] text-white rounded-lg shadow-lg"
-                    >
-                      <p>
-                        <strong>Usuário:</strong> {feedback.userName}
-                      </p>
-                      <p>
-                        <strong>Email:</strong> {feedback.userEmail}
-                      </p>
-                      <p>
-                        <strong>Nota:</strong> {feedback.rating} estrelas
-                      </p>
-                      <p>
-                        <strong>Comentário:</strong> {feedback.comment}
-                      </p>
-                      <button
-                        onClick={() => handleDeleteFeedback(feedback.id)}
-                        className="mt-2 bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 transition duration-200"
+          <div className="mb-8 flex justify-between items-center">
+            <input
+              type="text"
+              placeholder="Buscar por nome de usuário"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="p-2 border border-gray-300 rounded"
+            />
+            <select
+              value={selectedCourse}
+              onChange={(e) => setSelectedCourse(e.target.value)}
+              className="p-2 border border-gray-300 rounded"
+            >
+              <option value="">Todos os cursos</option>
+              {uniqueCourses.map((course, index) => (
+                <option key={index} value={course}>{course}</option>
+              ))}
+            </select>
+          </div>
+          <div className="bg-[#001a33] p-8 rounded-lg shadow-lg">
+            {filteredFeedbacks.length === 0 ? (
+              <p className="text-center text-lg text-[#00FA9A]">
+                Nenhum feedback disponível no momento.
+              </p>
+            ) : (
+              Object.keys(groupedFeedbacks).map((courseId) => (
+                <div key={courseId} className="mb-8">
+                  <h2 className="text-3xl font-semibold mb-4 text-[#00FA9A]">
+                    Curso: {groupedFeedbacks[courseId][0].courseName}
+                  </h2>
+                  <ul>
+                    {groupedFeedbacks[courseId].map((feedback, index) => (
+                      <li
+                        key={index}
+                        className="mb-4 p-4 bg-white text-[#001a33] rounded-lg shadow-lg"
                       >
-                        Remover
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))
-          )}
+                        <p>
+                          <strong>Usuário:</strong> {feedback.userName}
+                        </p>
+                        <p>
+                          <strong>Email:</strong> {feedback.userEmail}
+                        </p>
+                        <p>
+                          <strong>Nota:</strong> {feedback.rating} estrelas
+                        </p>
+                        <p>
+                          <strong>Comentário:</strong> {feedback.comment}
+                        </p>
+                        <button
+                          onClick={() => handleDeleteFeedback(feedback.id)}
+                          className="mt-2 bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 transition duration-200"
+                        >
+                          Remover
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))
+            )}
+          </div>
         </main>
       </div>
     </AdminRoute>

@@ -1,38 +1,42 @@
+import { useEffect, useState } from "react";
+import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
+import { db } from "../lib/firebaseConfig";
+import { motion } from "framer-motion";
+import Link from "next/link";
+import { FaEdit, FaTrash } from "react-icons/fa";
+import EditCourseModal from "./EditCourseModal";
+import LoadingSkeleton from "./LoadingSkeleton"; // Importando o componente de loading skeleton
 
-
-import { useEffect, useState } from 'react';
-import { db } from '../lib/firebaseConfig';
-import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
-import Link from 'next/link';
-import { FaTrash, FaEdit } from 'react-icons/fa';
-import EditCourseModal from './EditCourseModal';
-import { motion } from 'framer-motion'; // Importando a biblioteca de animação
-
-const CourseListAdmin = () => {
+const CourseListAdmin = ({ searchTerm }) => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentCourse, setCurrentCourse] = useState(null);
 
-  const fetchCourses = async () => {
-    try {
-      const coursesCollection = collection(db, 'cursos');
-      const coursesSnapshot = await getDocs(coursesCollection);
-      const coursesList = coursesSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setCourses(coursesList);
-    } catch (error) {
-      console.error('Erro ao buscar cursos:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const coursesCollection = collection(db, "cursos");
+        const coursesSnapshot = await getDocs(coursesCollection);
+        const coursesList = coursesSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setCourses(coursesList);
+      } catch (error) {
+        console.error("Erro ao buscar cursos:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchCourses();
   }, []);
+
+  const handleEdit = (course) => {
+    setCurrentCourse(course);
+    setIsModalOpen(true);
+  };
 
   const handleDelete = async (id) => {
     try {
@@ -45,10 +49,23 @@ const CourseListAdmin = () => {
     }
   };
 
-  const handleEdit = (course) => {
-    setCurrentCourse(course);
-    setIsModalOpen(true);
-  };
+  const filteredCourses = courses.filter(course =>
+    course.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  if (loading) {
+    return (
+      <div className="container mx-auto bg-[#001a2c] rounded-3xl shadow-2xl overflow-hidden my-8 p-8">
+        <h1 className="text-4xl font-bold mb-4 text-center text-[#00FA9A]">Lista de Cursos</h1>
+        <p className="text-center text-white mb-8">Explore nossa seleção de cursos e comece sua jornada de aprendizado</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <LoadingSkeleton key={index} />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto bg-[#001a2c] rounded-3xl shadow-2xl overflow-hidden my-8">
@@ -56,25 +73,23 @@ const CourseListAdmin = () => {
         <h1 className="text-4xl font-bold mb-4 text-center text-[#00FA9A]">Lista de Cursos</h1>
         <p className="text-center text-white mb-8">Explore nossa seleção de cursos e comece sua jornada de aprendizado</p>
         <Link href="/criar-curso">
-          <motion.button // Alterado para motion.button
+          <motion.button
             className="mb-8 bg-[#00FA9A] text-[#001a2c] px-6 py-3 rounded-lg shadow hover:bg-[#33FBB1] transition duration-300 font-medium text-lg"
-            whileHover={{ scale: 1.05, transition: { duration: 0 } }} // Aumenta instantaneamente ao passar o mouse
-            whileTap={{ scale: 0.95, transition: { duration: 0 } }} // Diminui instantaneamente ao clicar
+            whileHover={{ scale: 1.05, transition: { duration: 0 } }}
+            whileTap={{ scale: 0.95, transition: { duration: 0 } }}
           >
             Criar Curso
           </motion.button>
         </Link>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {loading ? (
-            Array.from({ length: 6 }).map((_, index) => (
-              <div key={index} className="bg-white h-48 rounded-lg animate-pulse"></div>
-            ))
-          ) : (
-            courses.map((course) => (
-              <motion.div // Alterado para motion.div
+        {filteredCourses.length === 0 ? (
+          <p className="text-center text-white">Nenhum curso disponível no momento.</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredCourses.map((course) => (
+              <motion.div
                 key={course.id}
                 className="bg-white rounded-lg shadow-lg p-6 transition-transform transform hover:scale-105 cursor-pointer relative"
-                whileTap={{ scale: 0.95, transition: { duration: 0.1 } }} // Animação de clique mais rápida
+                whileTap={{ scale: 0.95, transition: { duration: 0.1 } }}
               >
                 <Link href={`/cursos/${course.id}`}>
                   <h2 className="text-2xl font-semibold text-[#001a2c] hover:underline mb-3">{course.title}</h2>
@@ -95,15 +110,15 @@ const CourseListAdmin = () => {
                   <FaTrash size={20} />
                 </button>
               </motion.div>
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
       {isModalOpen && (
         <EditCourseModal
           course={currentCourse}
           onClose={() => setIsModalOpen(false)}
-          onRefresh={fetchCourses}
+          onRefresh={() => fetchCourses()}
         />
       )}
     </div>

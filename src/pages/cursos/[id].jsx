@@ -2,14 +2,31 @@ import { useEffect, useState } from "react";
 import StarRating from "../../components/StarRating";
 import FeedbackForm from "../../components/FeedbackForm";
 import { db } from "../../lib/firebaseConfig";
-import { doc, getDoc, collection, getDocs, addDoc } from "firebase/firestore";
+import { doc, getDoc, collection, getDocs, addDoc, setDoc } from "firebase/firestore";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { motion } from "framer-motion";
 import ProtectedRoute from "../../components/ProtectedRoute";
 import LoadingSpinner from "../../components/LoadingSpinner";
-import { updateUserProgress } from "../../lib/progress";
 import { useAuth } from "../../lib/AuthContext";
+
+export const updateUserProgress = async (userId, courseId, courseName, completedLessons, totalLessons, userName, userEmail) => {
+  try {
+    const progressPercentage = (completedLessons / totalLessons) * 100;
+    const userProgressDoc = doc(db, "userProgress", userId);
+    await setDoc(userProgressDoc, {
+      courseId,
+      courseName, // Salve o nome do curso
+      completedLessons,
+      totalLessons,
+      userName, // Salve o nome do usuário
+      userEmail, // Salve o email do usuário
+      progressPercentage // Salve o progresso percentual
+    }, { merge: true });
+  } catch (error) {
+    console.error("Erro ao atualizar o progresso do usuário:", error);
+  }
+};
 
 const CourseDetail = ({ course }) => {
   const router = useRouter();
@@ -75,7 +92,7 @@ const CourseDetail = ({ course }) => {
 
   const handleVideoClick = async (url, index, event) => {
     if (event) event.stopPropagation();
-  
+
     // Atualiza o estado de watchedVideos imediatamente
     setWatchedVideos((prevWatchedVideos) => {
       const updatedWatchedVideos = { ...prevWatchedVideos, [index]: true };
@@ -83,7 +100,7 @@ const CourseDetail = ({ course }) => {
         `watchedVideos_${id}`,
         JSON.stringify(updatedWatchedVideos)
       );
-  
+
       // Calcula o progresso imediatamente após atualizar o estado
       const totalWatched = Object.keys(updatedWatchedVideos).filter(
         (key) => updatedWatchedVideos[key]
@@ -92,13 +109,20 @@ const CourseDetail = ({ course }) => {
         totalWatched,
         course.youtubeLinks.length
       );
-  
+
+      // Obtenha o nome e o email do usuário
+      const userName = user.name || "Anônimo";
+      const userEmail = user.email || "Email não fornecido";
+
       // Atualiza o progresso do usuário
       updateUserProgress(
         user.uid,
         id,
+        course.title, // Passe o nome do curso
         validCompletedLessons,
-        course.youtubeLinks.length
+        course.youtubeLinks.length,
+        userName, // Passe o nome do usuário
+        userEmail // Passe o email do usuário
       ).then(() => {
         if (validCompletedLessons === course.youtubeLinks.length) {
           setShowFeedbackForm(true);
@@ -106,10 +130,10 @@ const CourseDetail = ({ course }) => {
       }).catch((error) => {
         console.error("Erro ao atualizar o progresso do usuário:", error);
       });
-  
+
       return updatedWatchedVideos;
     });
-  
+
     setSelectedVideo(new URL(url).searchParams.get("v"));
     localStorage.setItem(`selectedVideo_${id}`, index);
   };
@@ -292,7 +316,7 @@ const CourseDetail = ({ course }) => {
               </div>
             </aside>
           </div>
-          {showFeedbackForm && (
+          {showFeedbackForm && user && (
             <FeedbackForm
               courseId={id}
               userId={user.uid}

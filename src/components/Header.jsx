@@ -2,7 +2,7 @@ import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../lib/AuthContext";
 import { useRouter } from "next/router";
-import { FaHome, FaBook, FaPlus, FaComments, FaSignOutAlt, FaSignInAlt, FaUserPlus } from "react-icons/fa";
+import { FaHome, FaBook, FaPlus, FaComments, FaSignOutAlt, FaSignInAlt, FaUserPlus, FaChartBar } from "react-icons/fa";
 
 export default function Header() {
   const { user, signOut } = useAuth();
@@ -115,6 +115,13 @@ export default function Header() {
                           onClick={() => setIsMenuOpen(false)}
                         >
                           <FaComments className="mr-2" /> Feedbacks
+                        </Link>
+                        <Link
+                          href="/admin/monitoramento"
+                          className="block px-4 py-2 text-[#00FA9A] hover:bg-[#003a66] flex items-center transition-transform duration-200 transform"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          <FaChartBar className="mr-2" /> Monitoramento
                         </Link>
                       </>
                     )}

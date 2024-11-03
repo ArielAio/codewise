@@ -1,9 +1,11 @@
-// pages/cursos.js
 import Head from 'next/head';
+import { useState } from 'react';
 import CourseList from '../../components/CourseListAdmin';
 import AdminRoute from '../../components/AdminRoute'; // Importe o componente de proteção
 
 export default function Cursos() {
+  const [searchTerm, setSearchTerm] = useState("");
+
   return (
     <AdminRoute> {/* Envolve o conteúdo da página com o componente de proteção */}
       <div className="min-h-screen bg-white text-[#001a33]">
@@ -17,8 +19,18 @@ export default function Cursos() {
             <p className="text-xl text-white">Explore nossa seleção de cursos e comece sua jornada de aprendizado</p>
           </header>
 
+          <div className="mb-8 flex justify-center">
+            <input
+              type="text"
+              placeholder="Buscar por nome de curso"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="p-2 border border-gray-300 rounded w-full max-w-md"
+            />
+          </div>
+
           <section className="mb-16">
-            <CourseList />
+            <CourseList searchTerm={searchTerm} />
           </section>
 
           <section className="text-center mb-16">

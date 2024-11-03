@@ -1,7 +1,10 @@
 import Head from 'next/head';
+import { useState } from 'react';
 import CourseList from '../components/CourseList';
 
 export default function Cursos() {
+  const [searchTerm, setSearchTerm] = useState("");
+
   return (
     <div className="min-h-screen bg-white text-[#001a33]">
       <Head>
@@ -14,8 +17,18 @@ export default function Cursos() {
           <p className="text-xl text-white">Explore nossa seleção de cursos e comece sua jornada de aprendizado</p>
         </header>
 
+        <div className="mb-8 flex justify-center">
+          <input
+            type="text"
+            placeholder="Buscar por nome de curso"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="p-2 border border-gray-300 rounded w-full max-w-md"
+          />
+        </div>
+
         <section className="mb-16">
-          <CourseList />
+          <CourseList searchTerm={searchTerm} />
         </section>
 
         <section className="text-center mb-16">
