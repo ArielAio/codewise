@@ -4,11 +4,15 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { db } from '../lib/firebaseConfig';
 import { collection, getDocs } from 'firebase/firestore';
+import { useRouter } from 'next/router';
+import { useAuth } from '../lib/AuthContext';
 
 export default function Home() {
   const [currentCourseIndex, setCurrentCourseIndex] = useState(0);
   const [cursos, setCursos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchCursos = async () => {
@@ -64,20 +68,36 @@ export default function Home() {
     return selectedEmoji;
   };
 
+  const handleExploreCourses = () => {
+    if (user && user.permission === 'admin') {
+      router.push('/admin/cursos');
+    } else {
+      router.push('/cursos');
+    }
+  };
+
+  const getGreeting = () => {
+    const hours = new Date().getHours();
+    if (hours < 12) return 'Bom dia';
+    if (hours < 18) return 'Boa tarde';
+    return 'Boa noite';
+  };
+
   return (
-    <div className="min-h-screen bg-white text-[#001a33]">
+    <div className="min-h-screen bg-gradient-to-r from-blue-50 to-blue-100 text-[#001a33]">
       <Head>
-        <title>CodeWise - Aprenda programação com tranquilidade</title>
+        <title>Home - CodeWise</title>
       </Head>
 
       <main className="container mx-auto px-4 py-8">
-        <header className="text-center mb-16 bg-[#001a33] py-8 rounded-lg">
-          <div className="flex justify-center items-center flex-col">
-            <h1 className="text-5xl font-bold mb-4 text-[#00FA9A] transition-transform duration-300 transform hover:scale-105">
-              <img className="w-96 h-auto" src="/name-logo.png" alt="" />
+        <header className="text-center mb-16 bg-[#001a33] py-8 rounded-lg shadow-lg">
+          {user && (
+            <h1 className="text-4xl font-bold mb-4 text-[#00FA9A]">
+              {getGreeting()}, {user.name || 'Aluno'}!
             </h1>
-          </div>
-          <p className="text-xl text-white">Aprenda programação no seu ritmo, com serenidade e sabedoria</p>
+          )}
+          <h1 className="text-4xl font-bold mb-4 text-[#00FA9A]">Bem-vindo ao CodeWise</h1>
+          <p className="text-xl text-white">Transformando vidas através da programação</p>
         </header>
 
         <section className="mb-16">
@@ -105,10 +125,9 @@ export default function Home() {
           ) : (
             <p className="text-lg text-[#001a33]">Nenhum curso disponível no momento.</p>
           )}
-
         </section>
 
-        <section className="text-center mb-16 bg-[#001a33] py-12 px-4 rounded-lg">
+        <section className="text-center mb-16 bg-[#001a33] py-12 px-4 rounded-lg shadow-lg">
           <h2 className="text-4xl font-semibold mb-10 text-[#00FA9A]">Por que escolher a CodeWise?</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {[
@@ -126,11 +145,12 @@ export default function Home() {
         </section>
 
         <section className="text-center mb-16">
-          <h2 className="text-3xl font-semibold mb-8 text-[#001a33]">Comece sua jornada de aprendizado</h2>
-          <p className="text-lg mb-8 text-[#001a33]">Descubra seu potencial e transforme sua carreira com a CodeWise</p>
-          <a href="/cursos" className="bg-[#00FA9A] text-[#001a33] px-8 py-4 rounded-full text-xl font-bold inline-block transition-all duration-300 hover:bg-[#33FBB1] hover:shadow-lg transform hover:-translate-y-1 hover:scale-105">
+          <button
+            onClick={handleExploreCourses}
+            className="bg-[#00FA9A] text-[#001a33] px-8 py-4 rounded-full text-xl font-bold inline-block transition-all duration-300 hover:bg-[#33FBB1] hover:shadow-lg transform hover:-translate-y-1 hover:scale-105"
+          >
             Explorar Cursos
-          </a>
+          </button>
         </section>
 
         <section className="bg-[#001a33] rounded-lg p-8 shadow-lg text-white">

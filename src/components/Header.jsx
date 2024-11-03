@@ -1,7 +1,8 @@
-import Link from 'next/link';
-import { useState, useEffect, useRef } from 'react';
-import { useAuth } from '../lib/AuthContext';
-import { useRouter } from 'next/router';
+import Link from "next/link";
+import { useState, useEffect, useRef } from "react";
+import { useAuth } from "../lib/AuthContext";
+import { useRouter } from "next/router";
+import { FaHome, FaBook, FaPlus, FaComments, FaSignOutAlt, FaSignInAlt, FaUserPlus } from "react-icons/fa";
 
 export default function Header() {
   const { user, signOut } = useAuth();
@@ -21,9 +22,9 @@ export default function Header() {
     try {
       await signOut();
       setIsMenuOpen(false);
-      router.push('/login');
+      router.push("/login");
     } catch (error) {
-      console.error('Erro ao fazer logout:', error);
+      console.error("Erro ao fazer logout:", error);
     }
   };
 
@@ -33,12 +34,12 @@ export default function Header() {
         setIsMenuOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Evitar renderizar o Header se a rota for /login ou /register
-  if (router.pathname === '/login' || router.pathname === '/register') {
+  if (router.pathname === "/login" || router.pathname === "/register") {
     return null;
   }
 
@@ -49,8 +50,16 @@ export default function Header() {
       <div className="container mx-auto px-4 py-6 flex justify-between items-center">
         <Link href="/" className="text-3xl font-bold text-[#00FA9A]">
           <div className="flex items-center space-x-2">
-            <img src="/icon-logo.png" alt="CodeWise Icon Logo" className="h-10 w-auto" />
-            <img src="/name-logo.png" alt="CodeWise Name Logo" className="h-10 w-auto" />
+            <img
+              src="/icon-logo.png"
+              alt="CodeWise Icon Logo"
+              className="h-10 w-auto"
+            />
+            <img
+              src="/name-logo.png"
+              alt="CodeWise Name Logo"
+              className="h-10 w-auto"
+            />
           </div>
         </Link>
         <nav className="flex items-center space-x-6">
@@ -62,7 +71,7 @@ export default function Header() {
           >
             <button
               className={`text-[#00FA9A] hover:text-[#33FBB1] font-medium text-2xl transition-transform duration-200 ${
-                isMenuOpen ? 'scale-110' : 'scale-100'
+                isMenuOpen ? "scale-110" : "scale-100"
               }`}
               aria-label="Menu"
               onClick={handleClick}
@@ -78,29 +87,42 @@ export default function Header() {
                       className="block px-4 py-2 text-[#00FA9A] hover:bg-[#003a66] flex items-center transition-transform duration-200 transform"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      Início
+                      <FaHome className="mr-2" /> Início
                     </Link>
                     <Link
-                      href={user?.permission === 'admin' ? '/admin/cursos' : '/cursos'}
+                      href={
+                        user?.permission === "admin"
+                          ? "/admin/cursos"
+                          : "/cursos"
+                      }
                       className="block px-4 py-2 text-[#00FA9A] hover:bg-[#003a66] flex items-center transition-transform duration-200 transform"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      Cursos
+                      <FaBook className="mr-2" /> Cursos
                     </Link>
-                    {user?.permission === 'admin' && (
-                      <Link
-                        href="/criar-curso"
-                        className="block px-4 py-2 text-[#00FA9A] hover:bg-[#003a66] flex items-center transition-transform duration-200 transform"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        Criar Curso
-                      </Link>
+                    {user?.permission === "admin" && (
+                      <>
+                        <Link
+                          href="/criar-curso"
+                          className="block px-4 py-2 text-[#00FA9A] hover:bg-[#003a66] flex items-center transition-transform duration-200 transform"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          <FaPlus className="mr-2" /> Criar Curso
+                        </Link>
+                        <Link
+                          href="/admin/feedback"
+                          className="block px-4 py-2 text-[#00FA9A] hover:bg-[#003a66] flex items-center transition-transform duration-200 transform"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          <FaComments className="mr-2" /> Feedbacks
+                        </Link>
+                      </>
                     )}
                     <button
                       onClick={handleSignOut}
                       className="block px-4 py-2 text-red-500 hover:bg-[#003a66] flex items-center transition-transform duration-200 transform"
                     >
-                      Sair
+                      <FaSignOutAlt className="mr-2" /> Sair
                     </button>
                   </>
                 ) : (
@@ -110,14 +132,14 @@ export default function Header() {
                       className="block px-4 py-2 text-[#00FA9A] hover:bg-[#003a66] flex items-center transition-transform duration-200 transform"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      Entrar
+                      <FaSignInAlt className="mr-2" /> Entrar
                     </Link>
                     <Link
                       href="/register"
                       className="block px-4 py-2 text-[#00FA9A] hover:bg-[#003a66] flex items-center transition-transform duration-200 transform"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      Cadastrar
+                      <FaUserPlus className="mr-2" /> Cadastrar
                     </Link>
                   </>
                 )}

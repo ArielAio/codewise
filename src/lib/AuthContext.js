@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { auth, db } from '../lib/firebaseConfig';
+import { auth, db } from './firebaseConfig';
 import { onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 
@@ -7,6 +7,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -15,32 +16,31 @@ export const AuthProvider = ({ children }) => {
         const userDoc = await getDoc(userRef);
 
         if (userDoc.exists()) {
-          setUser({ ...user, permission: userDoc.data().permission });
+          setUser({ ...user, name: userDoc.data().name, permission: userDoc.data().permission });
         }
       } else {
         setUser(null);
       }
+      setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
 
-  // Função para realizar o logout
   const signOut = async () => {
     try {
       await firebaseSignOut(auth);
-      setUser(null); // Reseta o estado do usuário após o logout
+      setUser(null);
     } catch (error) {
       console.error('Erro ao fazer logout:', error);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, signOut }}>
+    <AuthContext.Provider value={{ user, signOut, loading }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-// Hook para usar o contexto de autenticação
 export const useAuth = () => useContext(AuthContext);

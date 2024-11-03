@@ -1,116 +1,138 @@
-import React, { useState } from 'react';
-import { auth, db } from '../lib/firebaseConfig';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { useState } from 'react';
 import { useRouter } from 'next/router';
+import { auth, db } from '../lib/firebaseConfig';
+import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 import Link from 'next/link';
 
-const RegisterForm = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
-    const router = useRouter();
+const Register = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-    const handleRegister = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setError('');
+  const handleRegister = async (event) => {
+    event.preventDefault();
+    setLoading(true);
+    setError('');
 
-        // Verifica se as senhas coincidem
-        if (password !== confirmPassword) {
-            setError('As senhas não coincidem.');
-            setLoading(false);
-            return;
-        }
+    if (password !== confirmPassword) {
+      setError('As senhas não coincidem.');
+      setLoading(false);
+      return;
+    }
 
-        try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
-            // Cria um novo documento para o usuário no Firestore
-            const newUserRef = doc(db, 'users', user.uid);
-            await setDoc(newUserRef, {
-                email: user.email,
-                permission: 'user',
-            });
+      // Extract name from email if name is not provided
+      const userName = name || email.split('@')[0];
 
-            console.log('Usuário registrado com sucesso:', user.uid);
-            router.push('/login'); // Redireciona para login após o registro
-        } catch (error) {
-            handleAuthError(error);
-        } finally {
-            setLoading(false);
-        }
-    };
+      // Save user name and permission in Firestore
+      await setDoc(doc(db, 'users', user.uid), {
+        name: userName,
+        email,
+        permission: 'user', // Default permission
+      });
 
-    const handleAuthError = (error) => {
-        switch (error.code) {
-            case 'auth/email-already-in-use':
-                setError('Este email já está em uso. Por favor, escolha outro email.');
-                break;
-            case 'auth/invalid-email':
-                setError('O email fornecido não é válido. Por favor, insira um email válido.');
-                break;
-            case 'auth/operation-not-allowed':
-                setError('A operação não é permitida. Por favor, contate o suporte.');
-                break;
-            case 'auth/weak-password':
-                setError('A senha deve ter pelo menos 6 caracteres. Por favor, insira uma senha mais forte.');
-                break;
-            case 'auth/too-many-requests':
-                setError('Você fez muitas tentativas de registro. Por favor, tente novamente mais tarde.');
-                break;
-            default:
-                setError('Erro ao registrar usuário. Por favor, tente novamente.');
-                break;
-        }
-    };
+      router.push('/');
+    } catch (error) {
+      setError('Erro ao registrar. Verifique suas informações.');
+      console.error('Erro ao registrar:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return (
-        <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100">
-            <h2 className="text-3xl font-bold mb-6 text-gray-800">Registrar Usuário</h2>
-            <form onSubmit={handleRegister} className="bg-white shadow-lg rounded-lg px-8 py-6 w-96">
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="border border-gray-300 rounded w-full py-3 px-4 mb-4 text-black focus:outline-none focus:ring-2 focus:ring-green-500"
-                />
-                <input
-                    type="password"
-                    placeholder="Senha"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="border border-gray-300 rounded w-full py-3 px-4 mb-4 text-black focus:outline-none focus:ring-2 focus:ring-green-500"
-                />
-                <input
-                    type="password"
-                    placeholder="Confirme a Senha"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                    className="border border-gray-300 rounded w-full py-3 px-4 mb-6 text-black focus:outline-none focus:ring-2 focus:ring-green-500"
-                />
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className={`bg-green-600 text-white font-bold py-2 rounded w-full ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-700'} transition duration-200`}
-                >
-                    {loading ? 'Carregando...' : 'Registrar'}
-                </button>
-                {error && <p className="mt-4 text-red-600">{error}</p>}
-            </form>
-            <p className="mt-4 text-gray-600">
-                Já tem uma conta? 
-                <Link href="/login" className="text-green-600 font-semibold hover:underline">  Entrar</Link>
-            </p>
-        </div>
-    );
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    setError('');
+    const provider = new GoogleAuthProvider();
+
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // Save user name and permission in Firestore
+      await setDoc(doc(db, 'users', user.uid), {
+        name: user.displayName,
+        email: user.email,
+        permission: 'user', // Default permission
+      });
+
+      router.push('/');
+    } catch (error) {
+      setError('Erro ao fazer login com o Google.');
+      console.error('Erro ao fazer login com o Google:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="bg-white shadow-lg rounded-lg p-8 max-w-md w-full">
+        <h1 className="text-4xl font-bold mb-8 text-center text-[#001a33]">Registrar</h1>
+        <form onSubmit={handleRegister}>
+          <input
+            type="text"
+            placeholder="Nome"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="border border-gray-300 rounded w-full py-3 px-4 mb-4 text-black focus:outline-none focus:ring-2 focus:ring-[#00FA9A]"
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="border border-gray-300 rounded w-full py-3 px-4 mb-4 text-black focus:outline-none focus:ring-2 focus:ring-[#00FA9A]"
+          />
+          <input
+            type="password"
+            placeholder="Senha"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="border border-gray-300 rounded w-full py-3 px-4 mb-4 text-black focus:outline-none focus:ring-2 focus:ring-[#00FA9A]"
+          />
+          <input
+            type="password"
+            placeholder="Confirmar Senha"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            className="border border-gray-300 rounded w-full py-3 px-4 mb-4 text-black focus:outline-none focus:ring-2 focus:ring-[#00FA9A]"
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            className={`bg-[#00FA9A] text-white font-bold py-2 rounded w-full ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#33FBB1]'} transition duration-200`}
+          >
+            {loading ? 'Carregando...' : 'Registrar'}
+          </button>
+          <button
+            type="button"
+            onClick={handleGoogleSignIn}
+            disabled={loading}
+            className={`mt-4 bg-[#4285F4] text-white font-bold py-2 rounded w-full ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#357AE8]'} transition duration-200`}
+          >
+            {loading ? 'Carregando...' : 'Entrar com o Google'}
+          </button>
+          {error && <p className="mt-4 text-red-600">{error}</p>}
+        </form>
+        <p className="mt-4 text-gray-600 text-center">
+          Já tem uma conta? 
+          <Link href="/login" className="text-[#00FA9A] font-semibold hover:underline"> Entrar</Link>
+        </p>
+      </div>
+    </div>
+  );
 };
 
-export default RegisterForm;
+export default Register;
