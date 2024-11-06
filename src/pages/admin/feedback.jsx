@@ -39,13 +39,19 @@ const Feedbacks = () => {
     }
   };
 
-  const filteredFeedbacks = feedbacks.filter(feedback => {
-    const matchesSearchTerm = feedback.userName.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCourse = selectedCourse ? feedback.courseName === selectedCourse : true;
+  const filteredFeedbacks = feedbacks.filter((feedback) => {
+    const matchesSearchTerm = feedback.userName
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesCourse = selectedCourse
+      ? feedback.courseName === selectedCourse
+      : true;
     return matchesSearchTerm && matchesCourse;
   });
 
-  const uniqueCourses = [...new Set(feedbacks.map(feedback => feedback.courseName))];
+  const uniqueCourses = [
+    ...new Set(feedbacks.map((feedback) => feedback.courseName)),
+  ];
 
   if (loading) {
     return (
@@ -85,22 +91,24 @@ const Feedbacks = () => {
           <h1 className="text-4xl font-bold mb-8 text-center text-[#001a33]">
             Feedbacks dos Cursos
           </h1>
-          <div className="mb-8 flex justify-between items-center">
+          <div className="mb-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <input
               type="text"
               placeholder="Buscar por nome de usuário"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="p-2 border border-gray-300 rounded"
+              className="p-2 border border-gray-300 rounded w-full md:w-auto"
             />
             <select
               value={selectedCourse}
               onChange={(e) => setSelectedCourse(e.target.value)}
-              className="p-2 border border-gray-300 rounded"
+              className="p-2 border border-gray-300 rounded w-full md:w-auto"
             >
               <option value="">Todos os cursos</option>
               {uniqueCourses.map((course, index) => (
-                <option key={index} value={course}>{course}</option>
+                <option key={index} value={course}>
+                  {course}
+                </option>
               ))}
             </select>
           </div>
