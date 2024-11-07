@@ -93,7 +93,7 @@ const CourseListAdmin = ({ searchTerm }) => {
               >
                 <Link href={`/cursos/${course.id}`}>
                   <h2 className="text-2xl font-semibold text-[#001a2c] hover:underline mb-3">{course.title}</h2>
-                  <p className="text-[#003a66] mt-2">{course.description}</p>
+                  <p className="text-[#003a66] mt-2 whitespace-pre-wrap">{course.description}</p>
                 </Link>
                 <button
                   onClick={() => handleEdit(course)}
