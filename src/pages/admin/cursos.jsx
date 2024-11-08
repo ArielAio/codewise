@@ -20,7 +20,7 @@ export default function Cursos() {
             <p className="text-xl text-white">Explore nossa seleção de cursos e comece sua jornada de aprendizado</p>
           </header>
 
-          <div className="mb-8 flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0">
+          <div className="mb-8 flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-4">
             <input
               type="text"
               placeholder="Buscar por nome de curso"

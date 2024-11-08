@@ -20,6 +20,7 @@ const EditCourseModal = ({ course, onClose, onRefresh }) => {
   const modalRef = useRef();
 
   useEffect(() => {
+    // Update state when course prop changes
     setTitle(course.title);
     setDescription(course.description);
     setYoutubeLinks(course.youtubeLinks || []);
@@ -28,12 +29,39 @@ const EditCourseModal = ({ course, onClose, onRefresh }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Validate YouTube links
+      const uniqueLinks = youtubeLinks.filter((link, index, self) =>
+        index === self.findIndex((l) => l.url === link.url)
+      );
+
+      if (uniqueLinks.length < youtubeLinks.length) {
+        alert('Não é permitido cadastrar duas aulas com o mesmo link do YouTube.');
+        return;
+      }
+
+      // Validate required fields
+      const validLinks = youtubeLinks.filter(link => link.title && link.url);
+      if (!title || !description || validLinks.length === 0) {
+        alert('Por favor, preencha todos os campos obrigatórios.');
+        return;
+      }
+
+      // Update course in Firestore
       const courseDoc = doc(db, 'cursos', course.id);
-      await updateDoc(courseDoc, { title, description, youtubeLinks });
-      onRefresh();
-      onClose();
+      await updateDoc(courseDoc, {
+        title: title.trim(),
+        description: description.trim(),
+        youtubeLinks: validLinks.map(link => ({
+          title: link.title.trim(),
+          url: link.url.trim()
+        }))
+      });
+
+      await onRefresh(); // Wait for refresh to complete
+      onClose(); // Close modal after successful update
     } catch (error) {
       console.error('Erro ao editar curso:', error);
+      alert('Erro ao editar curso: ' + error.message);
     }
   };
 
@@ -52,6 +80,7 @@ const EditCourseModal = ({ course, onClose, onRefresh }) => {
     setYoutubeLinks(newLinks);
   };
 
+  // Close modal when clicking outside
   const handleClickOutside = (event) => {
     if (modalRef.current && !modalRef.current.contains(event.target)) {
       onClose();

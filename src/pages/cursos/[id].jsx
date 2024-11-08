@@ -2,7 +2,14 @@ import { useEffect, useState } from "react";
 import StarRating from "../../components/StarRating";
 import FeedbackForm from "../../components/FeedbackForm";
 import { db } from "../../lib/firebaseConfig";
-import { doc, getDoc, collection, getDocs, addDoc, setDoc } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  collection,
+  getDocs,
+  addDoc,
+  setDoc,
+} from "firebase/firestore";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { motion } from "framer-motion";
@@ -10,125 +17,200 @@ import ProtectedRoute from "../../components/ProtectedRoute";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { useAuth } from "../../lib/AuthContext";
 
-export const updateUserProgress = async (userId, courseId, courseName, completedLessons, totalLessons, userName, userEmail) => {
+export const updateUserProgress = async (
+  userId,
+  courseId,
+  courseName,
+  completedLessons,
+  totalLessons,
+  userName,
+  userEmail,
+  feedbackGiven
+) => {
   try {
     const progressPercentage = (completedLessons / totalLessons) * 100;
     const userProgressDoc = doc(db, "userProgress", userId);
-    await setDoc(userProgressDoc, {
-      courseId,
-      courseName, // Salve o nome do curso
-      completedLessons,
-      totalLessons,
-      userName, // Salve o nome do usuário
-      userEmail, // Salve o email do usuário
-      progressPercentage // Salve o progresso percentual
-    }, { merge: true });
+    await setDoc(
+      userProgressDoc,
+      {
+        courseId,
+        courseName, // Salve o nome do curso
+        completedLessons,
+        totalLessons,
+        userName, // Salve o nome do usuário
+        userEmail, // Salve o email do usuário
+        progressPercentage, // Salve o progresso percentual
+        feedbackGiven, // Salve o estado do feedback
+      },
+      { merge: true }
+    );
+
+    // Salve o estado de conclusão do curso no localStorage
+    if (progressPercentage === 100) {
+      const completedCourses =
+        JSON.parse(localStorage.getItem("completedCourses")) || [];
+      if (!completedCourses.includes(courseId)) {
+        completedCourses.push(courseId);
+        localStorage.setItem(
+          `completedCourses_${courseId}`,
+          JSON.stringify(completedCourses)
+        );
+      }
+    }
   } catch (error) {
     console.error("Erro ao atualizar o progresso do usuário:", error);
   }
 };
 
-const CourseDetail = ({ course }) => {
+// Supondo que você tenha uma função para verificar se o usuário é admin
+const isAdmin = (user) => {
+  // lógica para verificar se o usuário é admin
+  return user && user.permission === "admin";
+};
+
+const CourseDetail = ({ course, initialSelectedVideo }) => {
   const router = useRouter();
   const { id } = router.query;
-  const [selectedVideo, setSelectedVideo] = useState(null);
+  const [selectedVideo, setSelectedVideo] = useState(initialSelectedVideo);
   const [watchedVideos, setWatchedVideos] = useState({});
   const [loading, setLoading] = useState(true);
-  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  const [showFeedbackForm, setShowFeedbackForm] = useState(true);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const { user } = useAuth();
 
+  const checkAllLessonsCompleted = (courseData) => {
+    return courseData.youtubeLinks.every((link) => link.completed);
+  };
+
+  const saveCompletionState = (courseId, state) => {
+    localStorage.setItem(`course_${courseId}_completed`, JSON.stringify(state));
+  };
+
+  const getCompletionState = (courseId) => {
+    return JSON.parse(localStorage.getItem(`course_${courseId}_completed`));
+  };
+
   useEffect(() => {
-    console.log("nome do user é: ", user);
-    const fetchCourse = async () => {
+    const fetchCourseAndProgress = async () => {
       try {
         const courseDoc = doc(db, "cursos", id);
         const courseSnapshot = await getDoc(courseDoc);
         if (courseSnapshot.exists()) {
           setSelectedVideo(courseSnapshot.data());
         }
+
+        const savedProgress = localStorage.getItem(`watchedVideos_${id}`);
+        let initialWatchedVideos = savedProgress
+          ? JSON.parse(savedProgress)
+          : {};
+
+        // Mark first video as watched if no saved progress
+        if (
+          !savedProgress &&
+          course &&
+          course.youtubeLinks &&
+          course.youtubeLinks.length > 0
+        ) {
+          initialWatchedVideos = { 0: true }; // Mark first video as watched
+          localStorage.setItem(
+            `watchedVideos_${id}`,
+            JSON.stringify(initialWatchedVideos)
+          );
+
+          // Update progress in Firebase
+          const userName = user?.name || "Anônimo";
+          const userEmail = user?.email || "Email não fornecido";
+
+          if (user) {
+            await updateUserProgress(
+              user.uid,
+              id,
+              course.title,
+              1, // One lesson completed
+              course.youtubeLinks.length,
+              userName,
+              userEmail,
+              false
+            );
+          }
+        }
+
+        setWatchedVideos(initialWatchedVideos);
+
+        const savedVideoIndex = localStorage.getItem(`selectedVideo_${id}`);
+        if (savedVideoIndex) {
+          const videoIndex = parseInt(savedVideoIndex, 10);
+          if (course.youtubeLinks && course.youtubeLinks[videoIndex]) {
+            setSelectedVideo(
+              new URL(course.youtubeLinks[videoIndex].url).searchParams.get("v")
+            );
+          }
+        } else if (
+          course &&
+          course.youtubeLinks &&
+          course.youtubeLinks.length > 0
+        ) {
+          setSelectedVideo(
+            new URL(course.youtubeLinks[0].url).searchParams.get("v")
+          );
+        }
+
+        // Rest of the existing code...
       } catch (error) {
         console.error("Erro ao buscar curso:", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchCourse();
-  }, [id]);
 
-  useEffect(() => {
-    if (course && course.youtubeLinks && course.youtubeLinks.length > 0) {
-      setSelectedVideo(
-        new URL(course.youtubeLinks[0].url).searchParams.get("v")
-      );
-    }
-  }, [course]);
+    fetchCourseAndProgress();
+  }, [id, course, user]);
 
-  useEffect(() => {
-    const savedProgress = localStorage.getItem(`watchedVideos_${id}`);
-    if (savedProgress) {
-      setWatchedVideos(JSON.parse(savedProgress));
+  const handleBackButtonClick = () => {
+    if (isAdmin(user)) {
+      router.push("/admin/cursos");
+    } else {
+      router.push("/cursos");
     }
-
-    const savedVideoIndex = localStorage.getItem(`selectedVideo_${id}`);
-    if (savedVideoIndex) {
-      const videoIndex = parseInt(savedVideoIndex, 10);
-      if (course.youtubeLinks && course.youtubeLinks[videoIndex]) {
-        setSelectedVideo(
-          new URL(course.youtubeLinks[videoIndex].url).searchParams.get("v")
-        );
-      }
-    } else if (
-      course &&
-      course.youtubeLinks &&
-      course.youtubeLinks.length > 0
-    ) {
-      setSelectedVideo(
-        new URL(course.youtubeLinks[0].url).searchParams.get("v")
-      );
-    }
-  }, [id, course]);
+  };
 
   const handleVideoClick = async (url, index, event) => {
-    if (event) event.stopPropagation();
+    if (event) event.preventDefault();
 
-    // Atualiza o estado de watchedVideos imediatamente
+    // Only mark the clicked video as watched
     setWatchedVideos((prevWatchedVideos) => {
-      const updatedWatchedVideos = { ...prevWatchedVideos, [index]: true };
-      localStorage.setItem(
-        `watchedVideos_${id}`,
-        JSON.stringify(updatedWatchedVideos)
-      );
+      const updatedWatchedVideos = {
+        ...prevWatchedVideos,
+        [index]: true,
+      };
 
-      // Calcula o progresso imediatamente após atualizar o estado
-      const totalWatched = Object.keys(updatedWatchedVideos).filter(
-        (key) => updatedWatchedVideos[key]
-      ).length;
+      const totalWatched =
+        Object.values(updatedWatchedVideos).filter(Boolean).length;
       const validCompletedLessons = Math.min(
         totalWatched,
         course.youtubeLinks.length
       );
 
-      // Obtenha o nome e o email do usuário
+      localStorage.setItem(
+        `watchedVideos_${id}`,
+        JSON.stringify(updatedWatchedVideos)
+      );
+
       const userName = user.name || "Anônimo";
       const userEmail = user.email || "Email não fornecido";
 
-      // Atualiza o progresso do usuário
       updateUserProgress(
         user.uid,
         id,
-        course.title, // Passe o nome do curso
+        course.title,
         validCompletedLessons,
         course.youtubeLinks.length,
-        userName, // Passe o nome do usuário
-        userEmail // Passe o email do usuário
-      ).then(() => {
-        if (validCompletedLessons === course.youtubeLinks.length) {
-          setShowFeedbackForm(true);
-        }
-      }).catch((error) => {
-        console.error("Erro ao atualizar o progresso do usuário:", error);
+        userName,
+        userEmail,
+        showFeedbackForm
+      ).catch((error) => {
+        console.error("Erro ao atualizar o progresso:", error);
       });
 
       return updatedWatchedVideos;
@@ -164,31 +246,19 @@ const CourseDetail = ({ course }) => {
     }
   };
 
-  const handleSubmitFeedback = async (event) => {
-    event.preventDefault();
-    try {
-      if (!user) {
-        throw new Error("Usuário não autenticado");
-      }
+  useEffect(() => {
+    const courseId = course.id;
+    const completionState = getCompletionState(courseId);
 
-      const userName = user.name || "Anônimo";
-      const userEmail = user.email || "Email não fornecido";
-
-      await addDoc(collection(db, "feedbacks"), {
-        userId: user.uid,
-        userName, // Ensure user name is captured
-        userEmail, // Capture user email
-        courseId: id,
-        courseName: course.title,
-        rating,
-        comment,
-      });
-      setShowFeedbackForm(false);
-      alert("Feedback enviado com sucesso!");
-    } catch (error) {
-      console.error("Erro ao enviar feedback:", error);
+    if (!completionState) {
+      const allCompleted = checkAllLessonsCompleted(course);
+      saveCompletionState(courseId, allCompleted);
     }
-  };
+
+    if (completionState) {
+      alert("Parabéns! Você concluiu todas as aulas.");
+    }
+  }, [course]);
 
   if (!course || !course.youtubeLinks) {
     return (
@@ -217,6 +287,12 @@ const CourseDetail = ({ course }) => {
         </Head>
 
         <main className="container mx-auto px-4 py-16">
+          <button
+            onClick={handleBackButtonClick}
+            className="bg-[#00FA9A] text-white py-2 px-4 rounded hover:bg-[#00FA7A]"
+          >
+            Voltar para Cursos
+          </button>
           <h2 className="text-4xl font-bold mb-8 text-center text-[#001a33]">
             {course.title}
           </h2>
@@ -323,7 +399,9 @@ const CourseDetail = ({ course }) => {
               userName={user.name || "Anônimo"}
               userEmail={user.email || "Email não fornecido"}
               courseTitle={course.title}
-              onClose={() => setShowFeedbackForm(false)}
+              onClose={() => {
+                setShowFeedbackForm(false);
+              }}
             />
           )}
         </main>
@@ -357,9 +435,14 @@ export async function getStaticProps({ params }) {
     };
   }
 
+  const initialSelectedVideo = new URL(
+    courseData.youtubeLinks[0].url
+  ).searchParams.get("v");
+
   return {
     props: {
       course: courseData,
+      initialSelectedVideo,
     },
     revalidate: 10,
   };

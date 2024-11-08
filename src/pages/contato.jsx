@@ -4,9 +4,9 @@ import { FaUserCircle } from 'react-icons/fa'; // Importando o ícone de perfil
 
 const profiles = [
   { name: 'Ariel Aio', link: 'https://www.linkedin.com/in/ariel-aio/' },
-  { name: 'Gabriel Nossa', link: 'https://www.instagram.com/gaba.nss/' },
+  { name: 'Gabriel Nossa', link: 'https://www.linkedin.com/in/gabriel-nossa-0951842ba/' },
   { name: 'Leonardo Sanga', link: 'https://www.linkedin.com/in/leonardo-minguini-sanga-386336224/' },
-  { name: 'Lucas Siconeli', link: '/perfil/lucas-siconeli' },
+  { name: 'Lucas Siconeli', link: 'https://www.linkedin.com/in/lucas-siconeli-b532262b6/' },
   { name: 'Matheus Coltro', link: 'https://www.linkedin.com/in/matheus-coltro-36a307280/' },
   { name: 'Vinicius Bruno', link: 'https://www.linkedin.com/in/vinicius-leandro-bruno-07aab1281/' },
 ];
