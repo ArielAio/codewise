@@ -16,6 +16,7 @@ import { motion } from "framer-motion";
 import ProtectedRoute from "../../components/ProtectedRoute";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { useAuth } from "../../lib/AuthContext";
+import { IoArrowBackCircle } from "react-icons/io5";
 
 export const updateUserProgress = async (
   userId,
@@ -286,12 +287,13 @@ const CourseDetail = ({ course, initialSelectedVideo }) => {
           <title>{course.title}</title>
         </Head>
 
-        <main className="container mx-auto px-4 py-16">
+        <main className="container mx-auto px-4 py-16 relative">
           <button
             onClick={handleBackButtonClick}
-            className="bg-[#00FA9A] text-white py-2 px-4 rounded hover:bg-[#00FA7A]"
+            className="absolute top-4 left-4 bg-[#00FA9A] hover:bg-[#00FA7A] text-white p-2 rounded-full shadow-lg transition-all duration-200 hover:scale-110"
+            title="Voltar para Cursos"
           >
-            Voltar para Cursos
+            <IoArrowBackCircle className="h-6 w-6" />
           </button>
           <h2 className="text-4xl font-bold mb-8 text-center text-[#001a33]">
             {course.title}
@@ -331,14 +333,14 @@ const CourseDetail = ({ course, initialSelectedVideo }) => {
                 <p className="text-white">Selecione uma aula para assistir.</p>
               )}
             </section>
-            <aside className="lg:col-span-1 bg-[#001a33] rounded-lg p-6 shadow-lg border border-[#00FA9A] relative">
+            <aside className="lg:col-span-1 bg-[#001a33] rounded-lg p-6 shadow-lg border border-[#00FA9A] flex flex-col h-[600px]">
               <h3 className="text-2xl font-semibold mb-4 text-[#00FA9A]">
                 Aulas do Curso
               </h3>
 
               {course.youtubeLinks && course.youtubeLinks.length > 0 ? (
-                <div className="space-y-4 h-[480px] overflow-y-auto overflow-x-hidden">
-                  <ul>
+                <div className="flex-1 overflow-y-auto overflow-x-hidden mb-16">
+                  <ul className="space-y-4">
                     {course.youtubeLinks.map((link, index) => (
                       <motion.li
                         key={index}
@@ -378,7 +380,7 @@ const CourseDetail = ({ course, initialSelectedVideo }) => {
                 </p>
               )}
 
-              <div className="absolute bottom-4 left-0 right-0 px-6">
+              <div className="mt-auto pt-4">
                 <div className="bg-gray-200 rounded-full h-4">
                   <div
                     className="bg-[#00FA9A] h-4 rounded-full transition-all duration-500"
