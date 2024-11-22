@@ -126,7 +126,10 @@ export default function Header() {
                       </>
                     )}
                     <button
-                      onClick={handleSignOut}
+                      onClick={() => {
+                        handleSignOut();
+                        setIsMenuOpen(false);
+                      }}
                       className="block px-4 py-2 text-red-500 hover:bg-[#003a66] flex items-center transition-transform duration-200 transform"
                     >
                       <FaSignOutAlt className="mr-2" /> Sair
