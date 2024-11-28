@@ -32,15 +32,15 @@ const CourseList = ({ searchTerm }) => {
     fetchCourses();
   }, []);
 
-  const indexOfLastCourse = currentPage * coursesPerPage;
-  const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
-  const currentCourses = courses.slice(indexOfFirstCourse, indexOfLastCourse);
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
   const filteredCourses = courses.filter((course) =>
     course.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const indexOfLastCourse = currentPage * coursesPerPage;
+  const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
+  const currentCourses = filteredCourses.slice(indexOfFirstCourse, indexOfLastCourse);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   if (loading) {
     return (
@@ -101,7 +101,7 @@ const CourseList = ({ searchTerm }) => {
         </div>
         <div className="flex justify-center mt-8">
           {Array.from(
-            { length: Math.ceil(courses.length / coursesPerPage) },
+            { length: Math.ceil(filteredCourses.length / coursesPerPage) },
             (_, i) => (
               <button
                 key={i + 1}

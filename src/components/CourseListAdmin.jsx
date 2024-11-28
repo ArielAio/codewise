@@ -36,11 +36,18 @@ const CourseListAdmin = ({ searchTerm }) => {
     fetchCourses();
   }, []);
 
+  // Primeiro aplique o filtro
+  const filteredCourses = courses.filter((course) =>
+    course.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Depois aplique a paginação nos cursos filtrados
   const indexOfLastCourse = currentPage * coursesPerPage;
   const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
-  const currentCourses = courses.slice(indexOfFirstCourse, indexOfLastCourse);
+  const currentCourses = filteredCourses.slice(indexOfFirstCourse, indexOfLastCourse);
 
-  const totalPages = Math.ceil(courses.length / coursesPerPage);
+  // Atualize o cálculo de páginas totais para usar filteredCourses
+  const totalPages = Math.ceil(filteredCourses.length / coursesPerPage);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -81,10 +88,6 @@ const CourseListAdmin = ({ searchTerm }) => {
       console.error("Erro ao excluir curso:", error);
     }
   };
-
-  const filteredCourses = courses.filter((course) =>
-    course.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   if (loading) {
     return (
@@ -130,6 +133,7 @@ const CourseListAdmin = ({ searchTerm }) => {
           <div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {currentCourses.map((course) => (
+                // ... resto do código do card do curso
                 <motion.div
                   key={course.id}
                   className="bg-white rounded-lg shadow-lg p-6 transition-transform transform hover:scale-105 cursor-pointer relative"
