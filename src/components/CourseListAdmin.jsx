@@ -6,14 +6,15 @@ import Link from "next/link";
 import { FaEdit, FaTrash, FaCheckCircle } from "react-icons/fa";
 import EditCourseModal from "./EditCourseModal";
 import LoadingSkeleton from "./LoadingSkeleton"; // Importando o componente de loading skeleton
+import ReactPaginate from 'react-paginate';
 
 const CourseListAdmin = ({ searchTerm }) => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentCourse, setCurrentCourse] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const coursesPerPage = 6;
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 5; // Adjust this number as needed
 
   const fetchCourses = async () => {
     try {
@@ -42,35 +43,12 @@ const CourseListAdmin = ({ searchTerm }) => {
   );
 
   // Depois aplique a paginação nos cursos filtrados
-  const indexOfLastCourse = currentPage * coursesPerPage;
-  const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
-  const currentCourses = filteredCourses.slice(indexOfFirstCourse, indexOfLastCourse);
+  const pageCount = Math.ceil(filteredCourses.length / itemsPerPage);
+  const offset = currentPage * itemsPerPage;
+  const currentItems = filteredCourses.slice(offset, offset + itemsPerPage);
 
-  // Atualize o cálculo de páginas totais para usar filteredCourses
-  const totalPages = Math.ceil(filteredCourses.length / coursesPerPage);
-
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
-  const renderPageNumbers = () => {
-    const pageNumbers = [];
-    for (let i = 1; i <= totalPages; i++) {
-      pageNumbers.push(
-        <button
-          key={i}
-          onClick={() => handlePageChange(i)}
-          className={`px-4 py-2 mx-1 rounded-lg shadow ${
-            currentPage === i
-              ? "bg-[#00FA9A] text-[#001a2c]"
-              : "bg-[#001a2c] text-[#00FA9A]"
-          }`}
-        >
-          {i}
-        </button>
-      );
-    }
-    return pageNumbers;
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
   };
 
   const handleEdit = (course) => {
@@ -107,6 +85,37 @@ const CourseListAdmin = ({ searchTerm }) => {
     );
   }
 
+  const paginationStyles = `
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 0.25rem;
+      margin-top: 2rem;
+    }
+
+    .page-item {
+      list-style: none;
+    }
+
+    .page-link {
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      background: #001a2c;
+      color: #00FA9A;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .active .page-link {
+      background: #00FA9A;
+      color: #001a2c;
+    }
+
+    .page-link:hover {
+      transform: translateY(-2px);
+    }
+  `;
+
   return (
     <div className="container mx-auto bg-[#001a2c] rounded-3xl shadow-2xl overflow-hidden my-8">
       <div className="p-8">
@@ -125,15 +134,14 @@ const CourseListAdmin = ({ searchTerm }) => {
             Criar Curso
           </motion.button>
         </Link>
-        {currentCourses.length === 0 ? (
+        {currentItems.length === 0 ? (
           <p className="text-center text-white">
             Nenhum curso disponível no momento.
           </p>
         ) : (
           <div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {currentCourses.map((course) => (
-                // ... resto do código do card do curso
+              {currentItems.map((course) => (
                 <motion.div
                   key={course.id}
                   className="bg-white rounded-lg shadow-lg p-6 transition-transform transform hover:scale-105 cursor-pointer relative"
@@ -173,12 +181,26 @@ const CourseListAdmin = ({ searchTerm }) => {
                 </motion.div>
               ))}
             </div>
-            <div className="flex justify-center mt-8">
-              {renderPageNumbers()}
-            </div>
+            <ReactPaginate
+              previousLabel={'Anterior'}
+              nextLabel={'Próximo'}
+              pageCount={pageCount}
+              onPageChange={handlePageChange}
+              containerClassName={'pagination'}
+              activeClassName={'active'}
+              previousClassName={'page-item'}
+              nextClassName={'page-item'}
+              pageClassName={'page-item'}
+              breakClassName={'page-item'}
+              pageLinkClassName={'page-link'}
+              previousLinkClassName={'page-link'}
+              nextLinkClassName={'page-link'}
+              breakLinkClassName={'page-link'}
+            />
           </div>
         )}
       </div>
+      <style>{paginationStyles}</style>
       {isModalOpen && (
         <EditCourseModal
           course={currentCourse}

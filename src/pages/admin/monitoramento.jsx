@@ -3,12 +3,15 @@ import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { db } from "../../lib/firebaseConfig";
 import AdminRoute from "../../components/AdminRoute";
 import LoadingSkeleton from "../../components/LoadingSkeleton"; // Importando o componente de loading skeleton
+import ReactPaginate from 'react-paginate';
 
 const UserProgress = () => {
   const [progressData, setProgressData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("");
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 5; // Adjust this number as needed
 
   useEffect(() => {
     const fetchProgressData = async () => {
@@ -46,6 +49,45 @@ const UserProgress = () => {
   });
 
   const uniqueCourses = [...new Set(progressData.map(progress => progress.courseName))];
+
+  const pageCount = Math.ceil(filteredData.length / itemsPerPage);
+  const offset = currentPage * itemsPerPage;
+  const currentItems = filteredData.slice(offset, offset + itemsPerPage);
+
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
+
+  const paginationStyles = `
+  .pagination {
+    display: flex;
+    justify-content: center;
+    gap: 0.25rem;
+    margin-top: 2rem;
+  }
+
+  .page-item {
+    list-style: none;
+  }
+
+  .page-link {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    background: #001a2c;
+    color: #00FA9A;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .active .page-link {
+    background: #00FA9A;
+    color: #001a2c;
+  }
+
+  .page-link:hover {
+    transform: translateY(-2px);
+  }
+`;
 
   if (loading) {
     return (
@@ -97,7 +139,7 @@ const UserProgress = () => {
               <p className="text-center text-red-500">Nenhum dado de progresso encontrado.</p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {filteredData.map((progress, index) => (
+                {currentItems.map((progress, index) => (
                   <div key={index} className="bg-white p-4 rounded-lg shadow-md text-[#001a33] relative">
                     <p><strong>Usuário:</strong> {progress.userName} ({progress.userEmail})</p>
                     <p><strong>Curso:</strong> {progress.courseName}</p>
@@ -113,9 +155,26 @@ const UserProgress = () => {
                 ))}
               </div>
             )}
+            <ReactPaginate
+              previousLabel={'Anterior'}
+              nextLabel={'Próximo'}
+              pageCount={pageCount}
+              onPageChange={handlePageChange}
+              containerClassName={'pagination'}
+              activeClassName={'active'}
+              previousClassName={'page-item'}
+              nextClassName={'page-item'}
+              pageClassName={'page-item'}
+              breakClassName={'page-item'}
+              pageLinkClassName={'page-link'}
+              previousLinkClassName={'page-link'}
+              nextLinkClassName={'page-link'}
+              breakLinkClassName={'page-link'}
+            />
           </div>
         </main>
       </div>
+      <style>{paginationStyles}</style>
     </AdminRoute>
   );
 };

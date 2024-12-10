@@ -4,12 +4,15 @@ import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 import Head from "next/head";
 import AdminRoute from "../../components/AdminRoute";
 import LoadingSkeleton from "../../components/LoadingSkeleton"; // Importando o componente de loading skeleton
+import ReactPaginate from 'react-paginate';
 
-const Feedbacks = () => {
+const Feedback = () => {
   const [feedbacks, setFeedbacks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("");
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 8;
 
   useEffect(() => {
     const fetchFeedbacks = async () => {
@@ -53,12 +56,53 @@ const Feedbacks = () => {
     ...new Set(feedbacks.map((feedback) => feedback.courseName)),
   ];
 
+  const pageCount = Math.ceil(feedbacks.length / itemsPerPage);
+  const offset = currentPage * itemsPerPage;
+  const currentItems = feedbacks.slice(offset, offset + itemsPerPage);
+
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
+
+  const paginationStyles = `
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 0.25rem;
+      margin-top: 2rem;
+    }
+
+    .page-item {
+      list-style: none;
+    }
+
+    .page-link {
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      background: #001a33;
+      color: #00FA9A;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .active .page-link {
+      background: #00FA9A;
+      color: #001a33;
+    }
+
+    .page-link:hover {
+      transform: translateY(-2px);
+      opacity: 0.9;
+    }
+  `;
+
   if (loading) {
     return (
       <AdminRoute>
         <div className="min-h-screen bg-white text-[#001a33]">
           <main className="container mx-auto px-4 py-16">
-            <h2 className="text-4xl font-bold mb-8 text-center text-[#001a33]">
+            <h2 className="text-4xl font-bold mb-8 text-center text123
+            -[#001a33]">
               Feedbacks dos Cursos
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -153,11 +197,29 @@ const Feedbacks = () => {
                 </div>
               ))
             )}
+          <ReactPaginate
+            previousLabel={'Anterior'}
+            nextLabel={'Próximo'}
+            pageCount={pageCount}
+            onPageChange={handlePageChange}
+            containerClassName={'pagination'}
+            activeClassName={'active'}
+            previousClassName={'page-item'}
+            nextClassName={'page-item'}
+            pageClassName={'page-item'}
+            breakClassName={'page-item'}
+            pageLinkClassName={'page-link'}
+            previousLinkClassName={'page-link'}
+            nextLinkClassName={'page-link'}
+            breakLinkClassName={'page-link'}
+          />
+          <style>{paginationStyles}</style>
           </div>
+        
         </main>
       </div>
     </AdminRoute>
   );
 };
 
-export default Feedbacks;
+export default Feedback;

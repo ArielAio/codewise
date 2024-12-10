@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
+import React, { useState, useEffect } from 'react';
 import { db } from "../lib/firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
-import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion';
+import Link from 'next/link';
+import ReactPaginate from 'react-paginate';
 import LoadingSkeleton from "./LoadingSkeleton";
-import { FaCheckCircle } from "react-icons/fa";
 
 const CourseList = ({ searchTerm }) => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const coursesPerPage = 10;
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 5; // Adjust this number as needed
 
   const fetchCourses = async () => {
     try {
@@ -36,11 +36,44 @@ const CourseList = ({ searchTerm }) => {
     course.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const indexOfLastCourse = currentPage * coursesPerPage;
-  const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
-  const currentCourses = filteredCourses.slice(indexOfFirstCourse, indexOfLastCourse);
+  const pageCount = Math.ceil(filteredCourses.length / itemsPerPage);
+  const offset = currentPage * itemsPerPage;
+  const currentItems = filteredCourses.slice(offset, offset + itemsPerPage);
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
+
+  const paginationStyles = `
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 0.25rem;
+      margin-top: 2rem;
+    }
+
+    .page-item {
+      list-style: none;
+    }
+
+    .page-link {
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      background: #001a2c;
+      color: #00FA9A;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .active .page-link {
+      background: #00FA9A;
+      color: #001a2c;
+    }
+
+    .page-link:hover {
+      transform: translateY(-2px);
+    }
+  `;
 
   if (loading) {
     return (
@@ -69,55 +102,65 @@ const CourseList = ({ searchTerm }) => {
         <p className="text-center text-white mb-8">
           Explore nossa seleção de cursos e comece sua jornada de aprendizado
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredCourses.length === 0 ? (
-            <p className="text-center text-white w-full">
-              Nenhum curso disponível no momento.
-            </p>
-          ) : (
-            currentCourses.map((course) => (
-              <motion.div
-                key={course.id}
-                className="bg-white rounded-lg shadow-lg p-6 transition-transform transform hover:scale-105 cursor-pointer relative"
-                whileTap={{ scale: 0.95, transition: { duration: 0.1 } }}
-              >
-                <Link href={`/cursos/${course.id}`}>
-                  <div className="w-full h-full">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h2 className="text-2xl font-semibold text-[#001a2c] hover:underline mb-3 flex items-center">
-                          {course.title}
-                        </h2>
+        <Link href="/criar-curso">
+          <motion.button
+            className="mb-8 bg-[#00FA9A] text-[#001a2c] px-6 py-3 rounded-lg shadow hover:bg-[#33FBB1] transition duration-300 font-medium text-lg"
+            whileHover={{ scale: 1.05, transition: { duration: 0 } }}
+            whileTap={{ scale: 0.95, transition: { duration: 0 } }}
+          >
+            Criar Curso
+          </motion.button>
+        </Link>
+        {filteredCourses.length === 0 ? (
+          <p className="text-center text-white">
+            Nenhum curso disponível no momento.
+          </p>
+        ) : (
+          <div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {currentItems.map((course) => (
+                <motion.div
+                  key={course.id}
+                  className="bg-white rounded-lg shadow-lg p-6 transition-transform transform hover:scale-105 cursor-pointer relative"
+                  whileTap={{ scale: 0.95, transition: { duration: 0.1 } }}
+                >
+                  <Link href={`/cursos/${course.id}`}>
+                    <div className="w-full h-full">
+                      <div className="flex flex-col">
+                        <div className="flex items-start justify-between">
+                          <h2 className="text-2xl font-semibold text-[#001a2c] hover:underline flex items-center">
+                            {course.title}
+                          </h2>
+                        </div>
                         <p className="text-[#003a66] mt-2 whitespace-pre-wrap">
                           {course.description}
                         </p>
                       </div>
                     </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))
-          )}
-        </div>
-        <div className="flex justify-center mt-8">
-          {Array.from(
-            { length: Math.ceil(filteredCourses.length / coursesPerPage) },
-            (_, i) => (
-              <button
-                key={i + 1}
-                onClick={() => paginate(i + 1)}
-                className={`mx-1 px-3 py-1 rounded ${
-                  currentPage === i + 1
-                    ? "bg-[#00FA9A] text-[#001a2c]"
-                    : "bg-[#003a66] text-white"
-                }`}
-              >
-                {i + 1}
-              </button>
-            )
-          )}
-        </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+            <ReactPaginate
+              previousLabel={'Anterior'}
+              nextLabel={'Próximo'}
+              pageCount={pageCount}
+              onPageChange={handlePageChange}
+              containerClassName={'pagination'}
+              activeClassName={'active'}
+              previousClassName={'page-item'}
+              nextClassName={'page-item'}
+              pageClassName={'page-item'}
+              breakClassName={'page-item'}
+              pageLinkClassName={'page-link'}
+              previousLinkClassName={'page-link'}
+              nextLinkClassName={'page-link'}
+              breakLinkClassName={'page-link'}
+            />
+          </div>
+        )}
       </div>
+      <style>{paginationStyles}</style>
     </div>
   );
 };
