@@ -11,7 +11,7 @@ const UserProgress = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
-  const itemsPerPage = 5; // Adjust this number as needed
+  const itemsPerPage = 12; // Adjust this number as needed
 
   useEffect(() => {
     const fetchProgressData = async () => {
