@@ -102,15 +102,6 @@ const CourseList = ({ searchTerm }) => {
         <p className="text-center text-white mb-8">
           Explore nossa seleção de cursos e comece sua jornada de aprendizado
         </p>
-        <Link href="/criar-curso">
-          <motion.button
-            className="mb-8 bg-[#00FA9A] text-[#001a2c] px-6 py-3 rounded-lg shadow hover:bg-[#33FBB1] transition duration-300 font-medium text-lg"
-            whileHover={{ scale: 1.05, transition: { duration: 0 } }}
-            whileTap={{ scale: 0.95, transition: { duration: 0 } }}
-          >
-            Criar Curso
-          </motion.button>
-        </Link>
         {filteredCourses.length === 0 ? (
           <p className="text-center text-white">
             Nenhum curso disponível no momento.
