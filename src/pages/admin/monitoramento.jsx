@@ -141,7 +141,9 @@ const UserProgress = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {currentItems.map((progress, index) => (
                   <div key={index} className="bg-white p-4 rounded-lg shadow-md text-[#001a33] relative">
-                    <p><strong>Usuário:</strong> {progress.userName} ({progress.userEmail})</p>
+                    <p><strong>Usuário:</strong> {progress.userName}</p>
+                    <p><strong>Email:</strong> {progress.userEmail}</p>
+
                     <p><strong>Curso:</strong> {progress.courseName}</p>
                     <p><strong>Aulas Completas:</strong> {progress.completedLessons} de {progress.totalLessons}</p>
                     <p><strong>Progresso:</strong> {((progress.completedLessons / progress.totalLessons) * 100).toFixed(2)}%</p>
