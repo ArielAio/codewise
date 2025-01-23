@@ -56,9 +56,20 @@ const Feedback = () => {
     ...new Set(feedbacks.map((feedback) => feedback.courseName)),
   ];
 
-  const pageCount = Math.ceil(feedbacks.length / itemsPerPage);
+  const groupByFeedbacks = (feedbacks) => {
+    return feedbacks.reduce((acc, feedback) => {
+      if (!acc[feedback.courseId]) {
+        acc[feedback.courseId] = [];
+      }
+      acc[feedback.courseId].push(feedback);
+      return acc;
+    }, {});
+  };
+
+  const pageCount = Math.ceil(filteredFeedbacks.length / itemsPerPage);
   const offset = currentPage * itemsPerPage;
-  const currentItems = feedbacks.slice(offset, offset + itemsPerPage);
+  const paginatedFeedbacks = filteredFeedbacks.slice(offset, offset + itemsPerPage);
+  const groupedFeedbacks = groupByFeedbacks(paginatedFeedbacks);
 
   const handlePageChange = ({ selected }) => {
     setCurrentPage(selected);
@@ -116,14 +127,6 @@ const Feedback = () => {
     );
   }
 
-  const groupedFeedbacks = filteredFeedbacks.reduce((acc, feedback) => {
-    if (!acc[feedback.courseId]) {
-      acc[feedback.courseId] = [];
-    }
-    acc[feedback.courseId].push(feedback);
-    return acc;
-  }, {});
-
   return (
     <AdminRoute>
       <div className="min-h-screen bg-white text-[#001a33]">
@@ -157,7 +160,7 @@ const Feedback = () => {
             </select>
           </div>
           <div className="bg-[#001a33] p-8 rounded-lg shadow-lg">
-            {filteredFeedbacks.length === 0 ? (
+            {paginatedFeedbacks.length === 0 ? (
               <p className="text-center text-lg text-[#00FA9A]">
                 Nenhum feedback disponível no momento.
               </p>
