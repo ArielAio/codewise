@@ -82,7 +82,6 @@ const CourseList = ({ searchTerm }) => {
   const currentItems = filteredCourses.slice(offset, offset + itemsPerPage);
 
   const handlePageChange = ({ selected }) => {
-    console.log('Mudança de página cursos:', selected);
     setCurrentPage(selected);
   };
 

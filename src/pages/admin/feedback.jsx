@@ -103,7 +103,6 @@ const Feedback = () => {
   const groupedFeedbacks = groupByFeedbacks(paginatedFeedbacks);
 
   const handlePageChange = ({ selected }) => {
-    console.log('Mudança de página feedback:', selected);
     setCurrentPage(selected);
   };
 

@@ -86,17 +86,7 @@ export default function UserProgress() {
   const offset = currentPage * itemsPerPage;
   const currentItems = filteredData.slice(offset, offset + itemsPerPage);
 
-  console.log('Dados de paginação:', {
-    totalItems: filteredData.length,
-    itemsPerPage,
-    pageCount,
-    currentPage,
-    offset,
-    currentItemsLength: currentItems.length
-  });
-
   const handlePageChange = ({ selected }) => {
-    console.log('Mudança de página solicitada:', selected);
     setCurrentPage(selected);
   };
 
