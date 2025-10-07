@@ -129,6 +129,15 @@ body {
   .codewise-button-secondary {
     @apply bg-white text-slate-700 border-2 border-slate-300 hover:border-[#00FA9A] hover:text-[#00FA9A] transition-colors duration-200;
   }
+  
+  /* Mobile menu improvements */
+  .mobile-menu-overlay {
+    @apply fixed inset-0 z-50 bg-black/60 backdrop-blur-sm;
+  }
+  
+  .mobile-menu-content {
+    @apply fixed right-0 top-0 z-50 h-full w-3/4 max-w-sm bg-white/95 backdrop-blur-md border-l-2 border-[#00FA9A]/20 shadow-2xl;
+  }
 }
 
 /* Improved readability for text elements */
@@ -160,5 +169,34 @@ body {
   
   .badge-outline-readable {
     @apply bg-[#00FA9A]/10 border-[#00FA9A]/30 text-slate-800 font-semibold;
+  }
+  
+  /* Expandable description utilities */
+  .description-container {
+    @apply relative overflow-hidden;
+  }
+  
+  .description-collapsed {
+    @apply max-h-20;
+  }
+  
+  .description-expanded {
+    @apply max-h-none;
+  }
+  
+  .description-fade-overlay {
+    @apply absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-slate-50 to-transparent pointer-events-none;
+  }
+  
+  .read-more-button {
+    @apply text-[#00FA9A] hover:text-[#00FA9A] hover:bg-[#00FA9A]/10 font-medium transition-all duration-200;
+  }
+  
+  .read-more-icon {
+    @apply inline-block transition-transform duration-300 ease-in-out;
+  }
+  
+  .read-more-icon-expanded {
+    @apply rotate-180;
   }
 }

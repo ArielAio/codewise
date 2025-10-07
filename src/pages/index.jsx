@@ -108,11 +108,7 @@ export default function Home() {
       title: "Comunidade Ativa", 
       description: "Conecte-se com outros desenvolvedores e compartilhe experiências de aprendizado."
     },
-    {
-      icon: FaCertificate,
-      title: "Certificação",
-      description: "Certificados reconhecidos pelo mercado para impulsionar sua carreira."
-    },
+   
     {
       icon: FaLaptopCode,
       title: "Mentoria Especializada",
@@ -281,7 +277,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {features.map((feature, index) => (
               <motion.div
                 key={index}

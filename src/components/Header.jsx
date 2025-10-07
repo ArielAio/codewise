@@ -141,20 +141,20 @@ export default function Header() {
               <div className="md:hidden">
                 <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                   <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon" className="hover:bg-[#00FA9A]/10 hover:text-[#00FA9A] text-slate-700">
                       <FaBars className="h-5 w-5" />
                     </Button>
                   </SheetTrigger>
-                  <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                  <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-white">
                     <SheetHeader>
-                      <SheetTitle>Menu</SheetTitle>
-                      <SheetDescription>
+                      <SheetTitle className="text-slate-900">Menu</SheetTitle>
+                      <SheetDescription className="text-slate-600">
                         Navegue pela plataforma CodeWise
                       </SheetDescription>
                     </SheetHeader>
                     <div className="grid gap-4 py-4">
                       {/* User Info */}
-                      <div className="flex items-center space-x-4 p-4 border rounded-lg">
+                      <div className="flex items-center space-x-4 p-4 border border-slate-200 rounded-lg bg-slate-50">
                         <Avatar className="h-10 w-10">
                           <AvatarImage src={user.avatar} alt={user.name} />
                           <AvatarFallback className="bg-[#001a2c] text-[#00FA9A]">
@@ -174,7 +174,7 @@ export default function Header() {
                             key={item.href}
                             href={item.href}
                             onClick={() => setIsSheetOpen(false)}
-                            className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent transition-colors"
+                            className="flex items-center space-x-3 p-3 rounded-lg hover:bg-slate-100 transition-colors text-slate-700 hover:text-[#00FA9A] font-medium"
                           >
                             <item.icon className="h-4 w-4" />
                             <span>{item.label}</span>
@@ -183,14 +183,14 @@ export default function Header() {
                         
                         {user?.permission === "admin" && (
                           <>
-                            <div className="border-t my-2"></div>
-                            <p className="text-xs font-semibold text-slate-700 px-3">ADMIN</p>
+                            <div className="border-t border-slate-200 my-2"></div>
+                            <p className="text-xs font-semibold text-slate-700 px-3 uppercase tracking-wide">Admin</p>
                             {adminItems.map((item) => (
                               <Link
                                 key={item.href}
                                 href={item.href}
                                 onClick={() => setIsSheetOpen(false)}
-                                className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent transition-colors"
+                                className="flex items-center space-x-3 p-3 rounded-lg hover:bg-slate-100 transition-colors text-slate-700 hover:text-[#00FA9A] font-medium"
                               >
                                 <item.icon className="h-4 w-4" />
                                 <span>{item.label}</span>
@@ -199,10 +199,10 @@ export default function Header() {
                           </>
                         )}
                         
-                        <div className="border-t my-2"></div>
+                        <div className="border-t border-slate-200 my-2"></div>
                         <button
                           onClick={handleSignOut}
-                          className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent transition-colors text-red-600 w-full text-left"
+                          className="flex items-center space-x-3 p-3 rounded-lg hover:bg-red-50 transition-colors text-red-600 hover:text-red-700 w-full text-left font-medium"
                         >
                           <FaSignOutAlt className="h-4 w-4" />
                           <span>Sair</span>
@@ -229,25 +229,25 @@ export default function Header() {
               <div className="md:hidden">
                 <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                   <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon" className="hover:bg-[#00FA9A]/10 hover:text-[#00FA9A] text-slate-700">
                       <FaBars className="h-5 w-5" />
                     </Button>
                   </SheetTrigger>
-                  <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                  <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-white">
                     <SheetHeader>
-                      <SheetTitle>Bem-vindo!</SheetTitle>
-                      <SheetDescription>
+                      <SheetTitle className="text-slate-900">Bem-vindo!</SheetTitle>
+                      <SheetDescription className="text-slate-600">
                         Entre ou cadastre-se para acessar os cursos
                       </SheetDescription>
                     </SheetHeader>
                     <div className="grid gap-4 py-4">
-                      <Button asChild onClick={() => setIsSheetOpen(false)}>
+                      <Button asChild onClick={() => setIsSheetOpen(false)} className="codewise-button-primary font-medium">
                         <Link href="/login" className="flex items-center justify-center">
                           <FaSignInAlt className="mr-2 h-4 w-4" />
                           Entrar
                         </Link>
                       </Button>
-                      <Button variant="outline" asChild onClick={() => setIsSheetOpen(false)}>
+                      <Button variant="outline" asChild onClick={() => setIsSheetOpen(false)} className="border-slate-300 text-slate-700 hover:border-[#00FA9A] hover:text-[#00FA9A] font-medium">
                         <Link href="/register" className="flex items-center justify-center">
                           <FaUserPlus className="mr-2 h-4 w-4" />
                           Cadastrar

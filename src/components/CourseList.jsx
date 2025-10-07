@@ -3,8 +3,10 @@ import { db } from "../lib/firebaseConfig";
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import ReactPaginate from 'react-paginate';
 import LoadingSkeleton from "./LoadingSkeleton";
+import ExpandableDescription from "./ExpandableDescription";
 import { FaEdit, FaTrash, FaPlus, FaPlay, FaClock, FaUsers } from "react-icons/fa";
 import EditCourseModal from "./EditCourseModal";
 import { useAuth } from "../lib/AuthContext";
@@ -33,12 +35,6 @@ const getYouTubeVideoId = (url) => {
   }
 };
 
-// Função para truncar texto
-const truncateText = (text, maxLength) => {
-  if (text.length <= maxLength) return text;
-  return text.substring(0, maxLength).trim() + '...';
-};
-
 const CourseList = ({ searchTerm }) => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -46,6 +42,7 @@ const CourseList = ({ searchTerm }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentCourse, setCurrentCourse] = useState(null);
   const { user } = useAuth();
+  const router = useRouter();
   const itemsPerPage = 5;
 
   // Verifica se o usuário é admin
@@ -100,15 +97,6 @@ const CourseList = ({ searchTerm }) => {
         console.error("Erro ao excluir curso:", error);
       }
     }
-  };
-
-  // Função para navegar para o curso
-  const handleCourseClick = (courseId, event) => {
-    // Previne navegação se clicou em botões administrativos
-    if (event && event.target.closest('.admin-button')) {
-      return;
-    }
-    window.location.href = `/courses/${courseId}`;
   };
 
   if (loading) {
@@ -191,37 +179,39 @@ const CourseList = ({ searchTerm }) => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <Card 
-                  className="bg-white/90 backdrop-blur-sm border-2 border-slate-200/60 hover:border-[#00FA9A]/60 group h-full cursor-pointer hover:shadow-xl transition-all duration-300 overflow-hidden hover:bg-white"
-                  onClick={(e) => handleCourseClick(course.id, e)}
-                >
-                  {/* Admin Actions */}
-                  {isAdmin && (
-                    <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10 flex space-x-1 sm:space-x-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEdit(course);
-                        }}
-                        className="admin-button codewise-button-secondary shadow-lg"
-                      >
-                        <FaEdit className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDelete(course.id);
-                        }}
-                        className="admin-button bg-red-500 hover:bg-red-600 shadow-lg text-white"
-                      >
-                        <FaTrash className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  )}
+                <Link href={`/courses/${course.id}`} className="block">
+                  <Card 
+                    className="bg-white/90 backdrop-blur-sm border-2 border-slate-200/60 hover:border-[#00FA9A]/60 group h-full cursor-pointer hover:shadow-xl transition-all duration-300 overflow-hidden hover:bg-white"
+                  >
+                    {/* Admin Actions */}
+                    {isAdmin && (
+                      <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-40 flex space-x-1 sm:space-x-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleEdit(course);
+                          }}
+                          className="admin-button codewise-button-secondary shadow-lg"
+                        >
+                          <FaEdit className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleDelete(course.id);
+                          }}
+                          className="admin-button bg-red-500 hover:bg-red-600 shadow-lg text-white"
+                        >
+                          <FaTrash className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    )}
 
                   <CardHeader className="pb-3 bg-gradient-to-r from-slate-50/50 to-green-50/30 rounded-t-lg">
                     <div className="flex items-start justify-between">
@@ -247,12 +237,10 @@ const CourseList = ({ searchTerm }) => {
                   {course.youtubeLinks && course.youtubeLinks.length > 0 && course.youtubeLinks[0].url && (
                     <div className="px-6 mb-4">
                       <div className="relative aspect-video bg-slate-100 rounded-lg overflow-hidden border-2 border-slate-300 shadow-sm">
-                        {/* Non-interactive overlay */}
-                        <div className="absolute inset-0 z-20 bg-transparent cursor-pointer"></div>
                         <iframe
                           src={`https://www.youtube.com/embed/${getYouTubeVideoId(course.youtubeLinks[0].url)}?autoplay=0&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1&fs=0&cc_load_policy=0&playsinline=1&enablejsapi=0`}
                           title="Preview do curso"
-                          className="w-full h-full"
+                          className="w-full h-full pointer-events-none"
                           frameBorder="0"
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                           allowFullScreen={false}
@@ -276,9 +264,15 @@ const CourseList = ({ searchTerm }) => {
                   )}
 
                   <CardContent className="space-y-4">
-                    <CardDescription className="text-sm leading-relaxed text-slate-700 bg-slate-50/50 p-3 rounded-md">
-                      {truncateText(course.description, 120)}
-                    </CardDescription>
+                    <div className="bg-slate-50/50 p-3 rounded-md">
+                      <ExpandableDescription 
+                        description={course.description}
+                        maxLength={120}
+                        maxHeight="60px"
+                        className="text-sm"
+                        buttonClassName="text-xs"
+                      />
+                    </div>
                     
                     <Separator className="bg-slate-300/60" />
                     
@@ -292,6 +286,7 @@ const CourseList = ({ searchTerm }) => {
                     </div>
                   </CardContent>
                 </Card>
+                </Link>
               </motion.div>
             ))}
           </div>
