@@ -13,6 +13,7 @@ import { FaUsers, FaGraduationCap, FaTrash, FaClock } from "react-icons/fa";
 
 export default function UserProgress() {
   const [progressData, setProgressData] = useState([]);
+  const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("");
@@ -20,24 +21,49 @@ export default function UserProgress() {
   const itemsPerPage = 12;
 
   useEffect(() => {
-    const fetchProgressData = async () => {
+    const fetchData = async () => {
       try {
+        // Buscar dados de progresso
         const progressCollection = collection(db, "userProgress");
         const progressSnapshot = await getDocs(progressCollection);
         const progressList = progressSnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
-        setProgressData(progressList);
+        
+        // Buscar cursos para obter os nomes reais
+        const coursesCollection = collection(db, "cursos");
+        const coursesSnapshot = await getDocs(coursesCollection);
+        const coursesList = coursesSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        
+        // Mapear progressData com nomes reais dos cursos
+        const progressWithRealCourseNames = progressList.map(progress => {
+          const course = coursesList.find(c => c.id === progress.courseId);
+          return {
+            ...progress,
+            courseName: course ? course.title : progress.courseName || 'Curso não encontrado'
+          };
+        });
+        
+        setProgressData(progressWithRealCourseNames);
+        setCourses(coursesList);
       } catch (error) {
-        console.error("Erro ao buscar dados de progresso:", error);
+        console.error("Erro ao buscar dados:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProgressData();
+    fetchData();
   }, []);
+
+  // Resetar página quando filtros mudarem
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [searchTerm, selectedCourse]);
 
   const handleDelete = async (id) => {
     try {
@@ -60,7 +86,17 @@ export default function UserProgress() {
   const offset = currentPage * itemsPerPage;
   const currentItems = filteredData.slice(offset, offset + itemsPerPage);
 
+  console.log('Dados de paginação:', {
+    totalItems: filteredData.length,
+    itemsPerPage,
+    pageCount,
+    currentPage,
+    offset,
+    currentItemsLength: currentItems.length
+  });
+
   const handlePageChange = ({ selected }) => {
+    console.log('Mudança de página solicitada:', selected);
     setCurrentPage(selected);
   };
 
@@ -226,11 +262,13 @@ export default function UserProgress() {
                 nextClassName={'px-4 py-2 text-sm font-medium text-slate-700 bg-white border-2 border-slate-300 rounded-md hover:bg-slate-50 hover:border-[#00FA9A] transition-colors cursor-pointer'}
                 pageClassName={'px-4 py-2 text-sm font-medium text-slate-700 bg-white border-2 border-slate-300 rounded-md hover:bg-slate-50 hover:border-[#00FA9A] transition-colors cursor-pointer'}
                 breakClassName={'px-4 py-2 text-sm font-medium text-slate-500'}
-                pageLinkClassName={'block'}
-                previousLinkClassName={'block'}
-                nextLinkClassName={'block'}
-                breakLinkClassName={'block'}
+                pageLinkClassName={'block w-full h-full'}
+                previousLinkClassName={'block w-full h-full'}
+                nextLinkClassName={'block w-full h-full'}
+                breakLinkClassName={'block w-full h-full'}
                 forcePage={currentPage}
+                marginPagesDisplayed={2}
+                pageRangeDisplayed={5}
               />
             </div>
           )}

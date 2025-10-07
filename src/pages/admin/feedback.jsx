@@ -13,6 +13,7 @@ import { FaComments, FaStar, FaTrash, FaGraduationCap, FaUser, FaEnvelope } from
 
 const Feedback = () => {
   const [feedbacks, setFeedbacks] = useState([]);
+  const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("");
@@ -20,23 +21,48 @@ const Feedback = () => {
   const itemsPerPage = 8;
 
   useEffect(() => {
-    const fetchFeedbacks = async () => {
+    const fetchData = async () => {
       try {
+        // Buscar feedbacks
         const feedbacksCollection = collection(db, "feedbacks");
         const feedbacksSnapshot = await getDocs(feedbacksCollection);
         const feedbacksData = feedbacksSnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
-        setFeedbacks(feedbacksData);
+        
+        // Buscar cursos para obter os nomes reais
+        const coursesCollection = collection(db, "cursos");
+        const coursesSnapshot = await getDocs(coursesCollection);
+        const coursesList = coursesSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        
+        // Mapear feedbacks com nomes reais dos cursos
+        const feedbacksWithRealCourseNames = feedbacksData.map(feedback => {
+          const course = coursesList.find(c => c.id === feedback.courseId);
+          return {
+            ...feedback,
+            courseName: course ? course.title : feedback.courseName || 'Curso não encontrado'
+          };
+        });
+        
+        setFeedbacks(feedbacksWithRealCourseNames);
+        setCourses(coursesList);
       } catch (error) {
-        console.error("Erro ao buscar feedbacks:", error);
+        console.error("Erro ao buscar dados:", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchFeedbacks();
+    fetchData();
   }, []);
+
+  // Resetar página quando filtros mudarem
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [searchTerm, selectedCourse]);
 
   const handleDeleteFeedback = async (feedbackId) => {
     try {
@@ -77,40 +103,9 @@ const Feedback = () => {
   const groupedFeedbacks = groupByFeedbacks(paginatedFeedbacks);
 
   const handlePageChange = ({ selected }) => {
+    console.log('Mudança de página feedback:', selected);
     setCurrentPage(selected);
   };
-
-  const paginationStyles = `
-    .pagination {
-      display: flex;
-      justify-content: center;
-      gap: 0.25rem;
-      margin-top: 2rem;
-    }
-
-    .page-item {
-      list-style: none;
-    }
-
-    .page-link {
-      padding: 0.5rem 1rem;
-      border-radius: 0.5rem;
-      background: #001a33;
-      color: #00FA9A;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .active .page-link {
-      background: #00FA9A;
-      color: #001a33;
-    }
-
-    .page-link:hover {
-      transform: translateY(-2px);
-      opacity: 0.9;
-    }
-  `;
 
   if (loading) {
     return (
@@ -286,11 +281,13 @@ const Feedback = () => {
                 nextClassName={'px-4 py-2 text-sm font-medium text-slate-700 bg-white border-2 border-slate-300 rounded-md hover:bg-slate-50 hover:border-[#00FA9A] transition-colors cursor-pointer'}
                 pageClassName={'px-4 py-2 text-sm font-medium text-slate-700 bg-white border-2 border-slate-300 rounded-md hover:bg-slate-50 hover:border-[#00FA9A] transition-colors cursor-pointer'}
                 breakClassName={'px-4 py-2 text-sm font-medium text-slate-500'}
-                pageLinkClassName={'block'}
-                previousLinkClassName={'block'}
-                nextLinkClassName={'block'}
-                breakLinkClassName={'block'}
+                pageLinkClassName={'block w-full h-full'}
+                previousLinkClassName={'block w-full h-full'}
+                nextLinkClassName={'block w-full h-full'}
+                breakLinkClassName={'block w-full h-full'}
                 forcePage={currentPage}
+                marginPagesDisplayed={2}
+                pageRangeDisplayed={5}
               />
             </div>
           )}

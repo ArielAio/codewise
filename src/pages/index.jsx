@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Badge } from '../components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { Separator } from '../components/ui/separator';
-import { FaPlay, FaBookOpen, FaUsers, FaCertificate, FaStar, FaArrowRight, FaCode, FaLaptopCode, FaMobile, FaServer } from 'react-icons/fa';
+import { FaPlay, FaBookOpen, FaUsers, FaStar, FaArrowRight, FaCode, FaLaptopCode, FaMobile, FaServer } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
 export default function Home() {
@@ -209,10 +209,6 @@ export default function Home() {
                 <div className="flex items-center space-x-2">
                   <FaStar className="h-4 w-4 text-[#00FA9A]" />
                   <span className="font-medium">4.9/5 Avaliação</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <FaCertificate className="h-4 w-4 text-[#00FA9A]" />
-                  <span className="font-medium">Certificado</span>
                 </div>
               </div>
             </motion.div>

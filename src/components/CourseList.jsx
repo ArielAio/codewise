@@ -68,6 +68,11 @@ const CourseList = ({ searchTerm }) => {
     fetchCourses();
   }, []);
 
+  // Resetar página quando o filtro de busca mudar
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [searchTerm]);
+
   const filteredCourses = courses.filter((course) =>
     course.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -77,6 +82,7 @@ const CourseList = ({ searchTerm }) => {
   const currentItems = filteredCourses.slice(offset, offset + itemsPerPage);
 
   const handlePageChange = ({ selected }) => {
+    console.log('Mudança de página cursos:', selected);
     setCurrentPage(selected);
   };
 
@@ -305,11 +311,13 @@ const CourseList = ({ searchTerm }) => {
                 nextClassName={'px-4 py-2 text-sm font-medium text-slate-700 bg-white border-2 border-slate-300 rounded-md hover:bg-slate-50 hover:border-[#00FA9A] transition-colors cursor-pointer'}
                 pageClassName={'px-4 py-2 text-sm font-medium text-slate-700 bg-white border-2 border-slate-300 rounded-md hover:bg-slate-50 hover:border-[#00FA9A] transition-colors cursor-pointer'}
                 breakClassName={'px-4 py-2 text-sm font-medium text-slate-500'}
-                pageLinkClassName={'block'}
-                previousLinkClassName={'block'}
-                nextLinkClassName={'block'}
-                breakLinkClassName={'block'}
+                pageLinkClassName={'block w-full h-full'}
+                previousLinkClassName={'block w-full h-full'}
+                nextLinkClassName={'block w-full h-full'}
+                breakLinkClassName={'block w-full h-full'}
                 forcePage={currentPage}
+                marginPagesDisplayed={2}
+                pageRangeDisplayed={5}
               />
             </div>
           )}
