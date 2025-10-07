@@ -51,7 +51,11 @@ const ExpandableDescription = ({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setIsExpanded(!isExpanded)}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsExpanded(!isExpanded);
+            }}
             className={`read-more-button group px-4 py-2 rounded-lg transition-all duration-200 ${
               showBorder ? 'border border-[#00FA9A]/20 hover:border-[#00FA9A]/40' : ''
             } ${buttonClassName}`}

@@ -1,7 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { db } from '../lib/firebaseConfig';
 import { doc, updateDoc } from 'firebase/firestore';
-import { FaTrash } from 'react-icons/fa';
+import { FaTrash, FaPlus, FaVideo, FaBook, FaEdit, FaTimes } from 'react-icons/fa';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Separator } from './ui/separator';
 
 const isValidYouTubeUrl = (url) => {
   const regex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/;
@@ -95,82 +99,195 @@ const EditCourseModal = ({ course, onClose, onRefresh }) => {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 overflow-y-auto">
-      <div ref={modalRef} className="bg-[#00264d] p-8 rounded-lg shadow-xl max-w-3xl w-full m-4 overflow-y-auto max-h-[80vh]">
-        <h2 className="text-3xl font-bold mb-6 text-[#00ffaa]">Editar Curso</h2>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-[#00ffaa] text-lg font-semibold mb-2">Título</label>
-            <input 
-              type="text" 
-              value={title} 
-              onChange={(e) => setTitle(e.target.value)} 
-              className="border border-[#00ffaa] bg-white rounded-lg w-full py-3 px-4 text-[#00264d] focus:outline-none focus:ring-2 focus:ring-[#00ffaa]" 
-              required 
-            />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm overflow-y-auto p-4">
+      <div ref={modalRef} className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-xl shadow-2xl">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-slate-50/50 to-green-50/30 p-6 border-b border-slate-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <Badge variant="outline" className="mb-3 bg-[#00FA9A]/10 border-[#00FA9A]/30 text-black font-semibold">
+                <FaEdit className="mr-1 h-3 w-3" />
+                Editar Curso
+              </Badge>
+              <h2 className="text-2xl lg:text-3xl font-bold text-readable">
+                Editar <span className="codewise-text-gradient">{course.title}</span>
+              </h2>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onClose}
+              className="text-slate-500 border-slate-200 hover:bg-slate-50"
+            >
+              <FaTimes className="h-4 w-4" />
+            </Button>
           </div>
-          <div>
-            <label className="block text-[#00ffaa] text-lg font-semibold mb-2">Descrição</label>
-            <textarea 
-              value={description} 
-              onChange={(e) => setDescription(e.target.value)} 
-              className="border border-[#00ffaa] bg-white rounded-lg w-full py-3 px-4 text-[#00264d] focus:outline-none focus:ring-2 focus:ring-[#00ffaa]" 
-              rows="4"
-              required 
-            />
-          </div>
-          <div>
-            <label className="block text-xl font-semibold mb-4 text-[#00ffaa]">Aulas</label>
-            {youtubeLinks.map((link, index) => (
-              <div key={index} className="mb-6">
-                <div className="flex space-x-4 mb-2">
+        </div>
+
+        {/* Content */}
+        <div className="p-6">
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Course Basic Info */}
+            <Card className="codewise-card">
+              <CardHeader>
+                <CardTitle className="text-xl text-readable flex items-center">
+                  <FaBook className="mr-3 h-5 w-5 text-[#00FA9A]" />
+                  Informações do Curso
+                </CardTitle>
+              </CardHeader>
+
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-lg font-semibold text-readable flex items-center">
+                    <FaBook className="mr-2 h-4 w-4 text-[#00FA9A]" />
+                    Nome do Curso
+                  </label>
                   <input
                     type="text"
-                    value={link.title}
-                    onChange={(e) => handleLinkChange(index, 'title', e.target.value)}
-                    className="w-1/2 p-3 border border-[#00ffaa] bg-white rounded-lg text-[#00264d] focus:outline-none focus:ring-2 focus:ring-[#00ffaa]"
-                    placeholder="Título da Aula"
-                    required
-                  />
-                  <input
-                    type="url"
-                    value={link.url}
-                    onChange={(e) => handleLinkChange(index, 'url', e.target.value)}
-                    className="w-1/2 p-3 border border-[#00ffaa] bg-white rounded-lg text-[#00264d] focus:outline-none focus:ring-2 focus:ring-[#00ffaa]"
-                    placeholder="Link do YouTube"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-[#00FA9A] focus:ring-2 focus:ring-[#00FA9A]/20 transition-colors text-readable"
+                    placeholder="Ex: Fundamentos de JavaScript"
                     required
                   />
                 </div>
-                {/* Pré-visualização do vídeo abaixo do link */}
-                {isValidYouTubeUrl(link.url) && (
-                  <iframe 
-                    width="100%" 
-                    height="200" 
-                    src={getYouTubeEmbedUrl(link.url)} 
-                    title={link.title} 
-                    frameBorder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowFullScreen 
-                    className="mt-4"
-                  ></iframe>
-                )}
-                {index > 0 && (
-                  <button type="button" onClick={() => removeLinkField(index)} className="text-red-400 mt-2 flex items-center hover:text-red-300 transition-colors">
-                    <FaTrash className="h-5 w-5 mr-1" />
-                    Remover
-                  </button>
-                )}
+
+                <div className="space-y-2">
+                  <label className="text-lg font-semibold text-readable">Descrição do Curso</label>
+                  <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-[#00FA9A] focus:ring-2 focus:ring-[#00FA9A]/20 transition-colors text-readable resize-none"
+                    rows="4"
+                    placeholder="Descreva o conteúdo e objetivos do curso..."
+                    required
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Separator className="bg-slate-200" />
+
+            {/* Video Lessons */}
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-bold text-readable flex items-center">
+                  <FaVideo className="mr-3 h-5 w-5 text-[#00FA9A]" />
+                  Aulas do Curso
+                </h3>
+                <Badge variant="secondary" className="bg-[#00FA9A]/20 text-[#001a2c] border border-[#00FA9A]/40 font-semibold">
+                  {youtubeLinks.filter(link => link.title && link.url).length} aulas
+                </Badge>
               </div>
-            ))}
-            <button type="button" onClick={addLinkField} className="text-[#00ffaa] font-semibold hover:text-[#33ffbb] transition-colors text-lg">
-              + Adicionar Nova Aula
-            </button>
-          </div>
-          <div className="flex justify-end space-x-4 mt-8">
-            <button type="button" onClick={onClose} className="px-6 py-3 border border-[#00ffaa] rounded-lg text-[#00ffaa] font-semibold hover:bg-[#004d99] transition-colors">Cancelar</button>
-            <button type="submit" className="px-6 py-3 bg-[#00ffaa] text-[#00264d] rounded-lg font-semibold hover:bg-[#33ffbb] transition-colors">Salvar Alterações</button>
-          </div>
-        </form>
+
+              <div className="space-y-4">
+                {youtubeLinks.map((link, index) => (
+                  <Card key={index} className="codewise-card border-slate-200">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-lg text-readable flex items-center">
+                          <FaVideo className="mr-2 h-4 w-4 text-[#00FA9A]" />
+                          Aula {index + 1}
+                        </CardTitle>
+                        {index > 0 && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeLinkField(index)}
+                            className="text-red-500 border-red-200 hover:bg-red-50 hover:border-red-300"
+                          >
+                            <FaTrash className="h-3 w-3 mr-1" />
+                            Remover
+                          </Button>
+                        )}
+                      </div>
+                    </CardHeader>
+
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-readable">Título da Aula</label>
+                          <input
+                            type="text"
+                            value={link.title}
+                            onChange={(e) => handleLinkChange(index, 'title', e.target.value)}
+                            className="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:border-[#00FA9A] focus:ring-2 focus:ring-[#00FA9A]/20 transition-colors text-readable"
+                            placeholder="Ex: Introdução ao JavaScript"
+                            required
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-readable">Link do YouTube</label>
+                          <input
+                            type="url"
+                            value={link.url}
+                            onChange={(e) => handleLinkChange(index, 'url', e.target.value)}
+                            className="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:border-[#00FA9A] focus:ring-2 focus:ring-[#00FA9A]/20 transition-colors text-readable"
+                            placeholder="https://youtube.com/watch?v=..."
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      {/* Video Preview */}
+                      {isValidYouTubeUrl(link.url) && (
+                        <div className="border-2 border-[#00FA9A]/20 rounded-lg overflow-hidden">
+                          <iframe
+                            width="100%"
+                            height="250"
+                            src={getYouTubeEmbedUrl(link.url)}
+                            title={link.title}
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            className="w-full"
+                          />
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+
+                {/* Add New Lesson Button */}
+                <div className="flex justify-center pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={addLinkField}
+                    className="border-[#00FA9A] text-[#00FA9A] hover:bg-[#00FA9A] hover:text-[#001a2c] transition-colors"
+                  >
+                    <FaPlus className="mr-2 h-4 w-4" />
+                    Adicionar Nova Aula
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <Separator className="bg-slate-200" />
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                className="border-slate-300 text-slate-600 hover:bg-slate-50 px-6"
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                size="lg"
+                className="codewise-button-primary font-semibold px-8"
+              >
+                <FaEdit className="mr-2 h-4 w-4" />
+                Salvar Alterações
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
