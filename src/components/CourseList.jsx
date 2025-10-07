@@ -5,9 +5,13 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import ReactPaginate from 'react-paginate';
 import LoadingSkeleton from "./LoadingSkeleton";
-import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
+import { FaEdit, FaTrash, FaPlus, FaPlay, FaClock, FaUsers } from "react-icons/fa";
 import EditCourseModal from "./EditCourseModal";
 import { useAuth } from "../lib/AuthContext";
+import { Button } from "./ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { Badge } from "./ui/badge";
+import { Separator } from "./ui/separator";
 
 // Função para extrair o ID do vídeo do YouTube
 const getYouTubeVideoId = (url) => {
@@ -107,56 +111,18 @@ const CourseList = ({ searchTerm }) => {
     window.location.href = `/courses/${courseId}`;
   };
 
-  const paginationStyles = `
-    .pagination {
-      display: flex;
-      justify-content: center;
-      gap: 0.25rem;
-      margin-top: 2rem;
-    }
-
-    .page-item {
-      list-style: none;
-    }
-
-    .page-link {
-      padding: 0.5rem 1rem;
-      border-radius: 0.5rem;
-      background: #001a2c;
-      color: #00FA9A;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .active .page-link {
-      background: #00FA9A;
-      color: #001a2c;
-    }
-
-    .page-link:hover {
-      transform: translateY(-2px);
-    }
-
-    .line-clamp-2 {
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      line-height: 1.75rem;
-      max-height: 3.5rem;
-    }
-  `;
-
   if (loading) {
     return (
-      <div className="container mx-auto bg-[#001a2c] rounded-3xl shadow-2xl overflow-hidden my-8 p-8">
-        <h1 className="text-4xl font-bold mb-4 text-center text-[#00FA9A]">
-          Lista de Cursos
-        </h1>
-        <p className="text-center text-white mb-8">
-          Explore nossa seleção de cursos e comece sua jornada de aprendizado
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="container mx-auto py-8 px-4">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-foreground mb-4">
+            Nossos Cursos
+          </h1>
+          <p className="text-xl text-slate-700 max-w-2xl mx-auto">
+            Explore nossa seleção de cursos e comece sua jornada de aprendizado
+          </p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {Array.from({ length: 6 }).map((_, index) => (
             <LoadingSkeleton key={index} />
           ))}
@@ -166,85 +132,127 @@ const CourseList = ({ searchTerm }) => {
   }
 
   return (
-    <div className="container mx-auto bg-[#001a2c] rounded-3xl shadow-2xl overflow-hidden my-8">
-      <div className="p-8">
-        <h1 className="text-4xl font-bold mb-4 text-center text-[#00FA9A]">
-          Lista de Cursos
+    <div className="container mx-auto py-8 px-4">
+      {/* Header Section */}
+      <div className="text-center mb-12">
+        <Badge variant="outline" className="mb-4 bg-[#00FA9A]/10 border-[#00FA9A]/30 text-black font-semibold">
+          📚 {isAdmin ? "Administração de" : "Explore nossos"} Cursos
+        </Badge>
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 text-readable">
+          {isAdmin ? "Gerenciar" : "Nossos"} <span className="codewise-text-gradient">Cursos</span>
         </h1>
-        <p className="text-center text-white mb-8">
-          Explore nossa seleção de cursos e comece sua jornada de aprendizado
+        <p className="text-lg sm:text-xl text-readable-muted max-w-2xl mx-auto px-4">
+          {isAdmin 
+            ? "Gerencie, edite e monitore todos os cursos da plataforma"
+            : "Explore nossa seleção cuidadosamente curada de cursos práticos e transforme sua carreira"
+          }
         </p>
-        
-        {/* Botão Criar Curso - apenas para admins */}
-        {isAdmin && (
-          <Link href="/create-course">
-            <motion.button
-              className="mb-8 bg-[#00FA9A] text-[#001a2c] px-6 py-3 rounded-lg shadow hover:bg-[#33FBB1] transition duration-300 font-medium text-lg flex items-center gap-2 mx-auto"
-              whileHover={{ scale: 1.05, transition: { duration: 0 } }}
-              whileTap={{ scale: 0.95, transition: { duration: 0 } }}
-            >
-              <FaPlus /> Criar Curso
-            </motion.button>
-          </Link>
-        )}
-        
-        {filteredCourses.length === 0 ? (
-          <p className="text-center text-white">
-            Nenhum curso disponível no momento.
+      </div>
+      
+      {/* Admin Create Course Button */}
+      {isAdmin && (
+        <div className="flex justify-center mb-12">
+          <Button size="lg" className="codewise-button-primary font-semibold" asChild>
+            <Link href="/create-course" className="flex items-center">
+              <FaPlus className="mr-2 h-4 w-4" />
+              Criar Novo Curso
+            </Link>
+          </Button>
+        </div>
+      )}
+      
+      {filteredCourses.length === 0 ? (
+        <div className="text-center py-20">
+          <div className="text-6xl mb-4">📚</div>
+          <h3 className="text-2xl font-semibold mb-2 text-readable">Nenhum curso encontrado</h3>
+          <p className="text-readable-muted">
+            {isAdmin 
+              ? "Comece criando seu primeiro curso!"
+              : "Novos cursos serão adicionados em breve."
+            }
           </p>
-        ) : (
-          <div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {currentItems.map((course) => (
-                <motion.div
-                  key={course.id}
-                  className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform transform hover:scale-105 cursor-pointer relative h-[500px] flex flex-col"
-                  whileTap={{ scale: 0.95, transition: { duration: 0.1 } }}
+          {isAdmin && (
+            <Button className="mt-6 codewise-button-primary font-semibold" asChild>
+              <Link href="/create-course">
+                <FaPlus className="mr-2 h-4 w-4" />
+                Criar Primeiro Curso
+              </Link>
+            </Button>
+          )}
+        </div>
+      ) : (
+        <div className="space-y-12">
+          {/* Courses Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+            {currentItems.map((course, index) => (
+              <motion.div
+                key={course.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
+                <Card 
+                  className="bg-white/90 backdrop-blur-sm border-2 border-slate-200/60 hover:border-[#00FA9A]/60 group h-full cursor-pointer hover:shadow-xl transition-all duration-300 overflow-hidden hover:bg-white"
                   onClick={(e) => handleCourseClick(course.id, e)}
                 >
-                  {/* Título do curso */}
-                  <div className="p-4 pb-2">
-                    <h2 className="text-xl font-bold text-[#001a2c] text-center line-clamp-2 min-h-[3.5rem] flex items-center justify-center">
-                      {course.title}
-                    </h2>
-                  </div>
-
-                  {/* Botões administrativos - apenas para admins */}
+                  {/* Admin Actions */}
                   {isAdmin && (
-                    <div className="absolute top-4 right-4 flex space-x-2 z-10">
-                      <button
+                    <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10 flex space-x-1 sm:space-x-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <Button
+                        size="sm"
+                        variant="secondary"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleEdit(course);
                         }}
-                        className="admin-button text-[#001a2c] hover:text-[#00FA9A] focus:outline-none bg-white p-2 rounded-full shadow-md transition-colors"
-                        aria-label="Editar curso"
+                        className="admin-button codewise-button-secondary shadow-lg"
                       >
-                        <FaEdit size={16} />
-                      </button>
-                      <button
+                        <FaEdit className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDelete(course.id);
                         }}
-                        className="admin-button text-red-400 hover:text-red-600 focus:outline-none bg-white p-2 rounded-full shadow-md transition-colors"
-                        aria-label="Excluir curso"
+                        className="admin-button bg-red-500 hover:bg-red-600 shadow-lg text-white"
                       >
-                        <FaTrash size={16} />
-                      </button>
+                        <FaTrash className="h-3 w-3" />
+                      </Button>
                     </div>
                   )}
 
-                  {/* Thumbnail da primeira aula - SEM INTERAÇÃO */}
+                  <CardHeader className="pb-3 bg-gradient-to-r from-slate-50/50 to-green-50/30 rounded-t-lg">
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-2 flex-1">
+                        <CardTitle className="text-lg sm:text-xl leading-tight group-hover:text-[#00FA9A] transition-colors duration-200 text-slate-800 font-bold">
+                          {course.title}
+                        </CardTitle>
+                        <div className="flex items-center space-x-2 sm:space-x-4 text-xs sm:text-sm text-slate-600">
+                          <div className="flex items-center bg-white/60 px-2 py-1 rounded-md">
+                            <FaClock className="mr-1 h-3 w-3 text-[#00FA9A]" />
+                            <span className="font-medium">{course.youtubeLinks?.length || 0} aulas</span>
+                          </div>
+                          <div className="flex items-center bg-white/60 px-2 py-1 rounded-md">
+                            <FaUsers className="mr-1 h-3 w-3 text-[#00FA9A]" />
+                            <span className="font-medium">Iniciante</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardHeader>
+
+                  {/* Course Thumbnail */}
                   {course.youtubeLinks && course.youtubeLinks.length > 0 && course.youtubeLinks[0].url && (
-                    <div className="px-4 pb-2">
-                      <div className="relative aspect-video bg-gray-100 rounded overflow-hidden">
-                        {/* Overlay para prevenir qualquer interação */}
+                    <div className="px-6 mb-4">
+                      <div className="relative aspect-video bg-slate-100 rounded-lg overflow-hidden border-2 border-slate-300 shadow-sm">
+                        {/* Non-interactive overlay */}
                         <div className="absolute inset-0 z-20 bg-transparent cursor-pointer"></div>
                         <iframe
                           src={`https://www.youtube.com/embed/${getYouTubeVideoId(course.youtubeLinks[0].url)}?autoplay=0&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1&fs=0&cc_load_policy=0&playsinline=1&enablejsapi=0`}
-                          title="Thumbnail do curso"
-                          className="w-full h-full rounded border-2 border-[#00FA9A]"
+                          title="Preview do curso"
+                          className="w-full h-full"
                           frameBorder="0"
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                           allowFullScreen={false}
@@ -257,50 +265,63 @@ const CourseList = ({ searchTerm }) => {
                           }}
                           tabIndex="-1"
                         />
+                        {/* Play overlay */}
+                        <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          <div className="bg-white/95 rounded-full p-3 shadow-lg">
+                            <FaPlay className="h-6 w-6 text-[#001a2c]" />
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}
 
-                  {/* Descrição */}
-                  <div className="flex-1 px-4 pb-4 flex flex-col justify-between">
-                    <div>
-                      <p className="text-[#003a66] text-sm leading-relaxed text-justify mb-4">
-                        {truncateText(course.description, 150)}
-                      </p>
-                    </div>
+                  <CardContent className="space-y-4">
+                    <CardDescription className="text-sm leading-relaxed text-slate-700 bg-slate-50/50 p-3 rounded-md">
+                      {truncateText(course.description, 120)}
+                    </CardDescription>
                     
-                    {/* Indicador visual de clique */}
-                    <div className="mt-auto">
-                      <div className="w-full bg-[#001a2c] text-[#00FA9A] px-4 py-2 rounded text-center hover:bg-[#003366] transition-colors duration-300 font-medium">
-                        Clique para Ver Curso
+                    <Separator className="bg-slate-300/60" />
+                    
+                    <div className="flex items-center justify-between">
+                      <Badge variant="secondary" className="bg-[#00FA9A]/20 text-[#001a2c] border border-[#00FA9A]/40 font-semibold">
+                        Programação
+                      </Badge>
+                      <div className="text-sm text-slate-700 font-medium bg-slate-100/60 px-3 py-1 rounded-md">
+                        Clique para acessar
                       </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-            <ReactPaginate
-              previousLabel={'Anterior'}
-              nextLabel={'Próximo'}
-              pageCount={pageCount}
-              onPageChange={handlePageChange}
-              containerClassName={'pagination'}
-              activeClassName={'active'}
-              previousClassName={'page-item'}
-              nextClassName={'page-item'}
-              pageClassName={'page-item'}
-              breakClassName={'page-item'}
-              pageLinkClassName={'page-link'}
-              previousLinkClassName={'page-link'}
-              nextLinkClassName={'page-link'}
-              breakLinkClassName={'page-link'}
-            />
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
           </div>
-        )}
-      </div>
-      <style>{paginationStyles}</style>
+
+          {/* Pagination */}
+          {pageCount > 1 && (
+            <div className="flex justify-center mt-12">
+              <ReactPaginate
+                previousLabel={'← Anterior'}
+                nextLabel={'Próximo →'}
+                pageCount={pageCount}
+                onPageChange={handlePageChange}
+                containerClassName={'flex items-center space-x-2'}
+                activeClassName={'bg-[#00FA9A] text-[#001a2c] border-[#00FA9A]'}
+                previousClassName={'px-4 py-2 text-sm font-medium text-slate-700 bg-white border-2 border-slate-300 rounded-md hover:bg-slate-50 hover:border-[#00FA9A] transition-colors cursor-pointer'}
+                nextClassName={'px-4 py-2 text-sm font-medium text-slate-700 bg-white border-2 border-slate-300 rounded-md hover:bg-slate-50 hover:border-[#00FA9A] transition-colors cursor-pointer'}
+                pageClassName={'px-4 py-2 text-sm font-medium text-slate-700 bg-white border-2 border-slate-300 rounded-md hover:bg-slate-50 hover:border-[#00FA9A] transition-colors cursor-pointer'}
+                breakClassName={'px-4 py-2 text-sm font-medium text-slate-500'}
+                pageLinkClassName={'block'}
+                previousLinkClassName={'block'}
+                nextLinkClassName={'block'}
+                breakLinkClassName={'block'}
+                forcePage={currentPage}
+              />
+            </div>
+          )}
+        </div>
+      )}
       
-      {/* Modal de edição - apenas para admins */}
+      {/* Edit Course Modal */}
       {isAdmin && isModalOpen && (
         <EditCourseModal
           course={currentCourse}

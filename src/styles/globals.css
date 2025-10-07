@@ -25,3 +25,140 @@ body {
     text-wrap: balance;
   }
 }
+
+@layer base {
+  :root {
+    /* Core colors with high contrast */
+    --background: 0 0% 100%;
+    --foreground: 210 11% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 210 11% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 11% 15%;
+    
+    /* Primary colors based on CodeWise brand */
+    --primary: 160 100% 31%;  /* #00FA9A - CodeWise green */
+    --primary-foreground: 210 100% 8%;  /* #001a2c - CodeWise dark */
+    
+    /* Secondary colors with better contrast */
+    --secondary: 210 40% 95%;
+    --secondary-foreground: 210 11% 15%;
+    
+    /* Muted colors for subtle text */
+    --muted: 210 40% 96%;
+    --muted-foreground: 210 15% 35%;
+    
+    /* Accent colors */
+    --accent: 210 40% 96%;
+    --accent-foreground: 210 11% 15%;
+    
+    /* Destructive colors */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    
+    /* Border and input colors */
+    --border: 210 20% 82%;
+    --input: 210 20% 82%;
+    --ring: 160 100% 31%;  /* CodeWise green for focus */
+    
+    /* Chart colors */
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+  }
+  
+  .dark {
+    --background: 210 100% 8%;  /* #001a2c - CodeWise dark */
+    --foreground: 0 0% 98%;
+    --card: 210 100% 8%;
+    --card-foreground: 0 0% 98%;
+    --popover: 210 100% 8%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 160 100% 31%;  /* #00FA9A - CodeWise green */
+    --primary-foreground: 210 100% 8%;
+    --secondary: 210 32% 18%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 210 32% 18%;
+    --muted-foreground: 210 20% 65%;
+    --accent: 210 32% 18%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 210 32% 18%;
+    --input: 210 32% 18%;
+    --ring: 160 100% 31%;  /* CodeWise green for focus */
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  }
+}
+
+/* CodeWise specific styles */
+@layer components {
+  .codewise-gradient {
+    @apply bg-gradient-to-br from-[#001a2c] to-[#002d4a];
+  }
+  
+  .codewise-text-gradient {
+    @apply bg-gradient-to-r from-[#00FA9A] to-[#33FBB1] bg-clip-text text-transparent;
+  }
+  
+  .codewise-card {
+    @apply bg-white border-2 border-slate-200 hover:border-[#00FA9A]/50 transition-all duration-300;
+  }
+  
+  .codewise-button-primary {
+    @apply bg-[#00FA9A] text-[#001a2c] hover:bg-[#33FBB1] transition-colors duration-200;
+  }
+  
+  .codewise-button-secondary {
+    @apply bg-white text-slate-700 border-2 border-slate-300 hover:border-[#00FA9A] hover:text-[#00FA9A] transition-colors duration-200;
+  }
+}
+
+/* Improved readability for text elements */
+@layer utilities {
+  .text-readable {
+    @apply text-slate-900;
+  }
+  
+  .text-readable-muted {
+    @apply text-slate-600;
+  }
+  
+  .text-readable-subtle {
+    @apply text-slate-500;
+  }
+  
+  .bg-readable-surface {
+    @apply bg-white border border-slate-200;
+  }
+  
+  .bg-readable-accent {
+    @apply bg-slate-50 border border-slate-200;
+  }
+  
+  /* Badge improvements for better contrast */
+  .badge-readable {
+    @apply text-slate-800 font-semibold;
+  }
+  
+  .badge-outline-readable {
+    @apply bg-[#00FA9A]/10 border-[#00FA9A]/30 text-slate-800 font-semibold;
+  }
+}
