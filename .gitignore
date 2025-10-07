@@ -34,3 +34,24 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Temporary documentation files (keep only README.md)
+*_REPORT.md
+*_FIXES.md
+*_CHANGES.md
+*_IMPROVEMENTS.md
+*_STANDARDIZATION.md
+*_IMPLEMENTATION.md
+BADGE_*.md
+COMPREHENSIVE_*.md
+CONTRAST_*.md
+EDIT_*.md
+EXPANDABLE_*.md
+FINAL_*.md
+NAMING_*.md
+NAVIGATION_*.md
+PAGINATION_*.md
+UNIFICATION_*.md
+
+# Keep README.md (this line is just for clarity - README.md is not ignored)
+# !README.md
