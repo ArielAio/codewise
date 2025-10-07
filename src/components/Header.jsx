@@ -90,11 +90,7 @@ export default function Header() {
                       <FaHome className="mr-2" /> Início
                     </Link>
                     <Link
-                      href={
-                        user?.permission === "admin"
-                          ? "/admin/cursos"
-                          : "/cursos"
-                      }
+                      href="/courses"
                       className="block px-4 py-2 text-[#00FA9A] hover:bg-[#003a66] flex items-center transition-transform duration-200 transform"
                       onClick={() => setIsMenuOpen(false)}
                     >
@@ -103,7 +99,7 @@ export default function Header() {
                     {user?.permission === "admin" && (
                       <>
                         <Link
-                          href="/criar-curso"
+                          href="/create-course"
                           className="block px-4 py-2 text-[#00FA9A] hover:bg-[#003a66] flex items-center transition-transform duration-200 transform"
                           onClick={() => setIsMenuOpen(false)}
                         >
@@ -117,7 +113,7 @@ export default function Header() {
                           <FaComments className="mr-2" /> Feedbacks
                         </Link>
                         <Link
-                          href="/admin/monitoramento"
+                          href="/admin/monitoring"
                           className="block px-4 py-2 text-[#00FA9A] hover:bg-[#003a66] flex items-center transition-transform duration-200 transform"
                           onClick={() => setIsMenuOpen(false)}
                         >

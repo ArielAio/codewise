@@ -169,11 +169,7 @@ const CourseDetail = ({ course, initialSelectedVideo }) => {
   }, [id, course, user]);
 
   const handleBackButtonClick = () => {
-    if (isAdmin(user)) {
-      router.push("/admin/cursos");
-    } else {
-      router.push("/cursos");
-    }
+    router.push("/courses");
   };
 
   const handleVideoClick = async (url, index, event) => {

@@ -33,7 +33,7 @@ export default function AddCourse() {
       setCourseName('');
       setYoutubeLinks([{ title: '', url: '' }]);
 
-      router.push('/admin/cursos');
+      router.push('/courses');
     } catch (error) {
       console.error('Erro ao adicionar curso:', error);
       alert(error.message);

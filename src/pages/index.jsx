@@ -69,11 +69,7 @@ export default function Home() {
   };
 
   const handleExploreCourses = () => {
-    if (user && user.permission === 'admin') {
-      router.push('/admin/cursos');
-    } else {
-      router.push('/cursos');
-    }
+    router.push('/courses');
   };
 
   const getGreeting = () => {
@@ -109,13 +105,13 @@ export default function Home() {
             <div className="text-center mb-4">
               <div className="inline-block transition-all duration-500 ease-in-out transform hover:scale-110 cursor-pointer">
                 <div className="flex flex-col items-center">
-                  <Link href={`/cursos/${cursos[currentCourseIndex]?.id}`}>
+                  <Link href={`/courses/${cursos[currentCourseIndex]?.id}`}>
                     <span className="text-6xl mb-2 inline-block">
                       {getRandomEmoji()}
                     </span>
                   </Link>
                   <h3 className="text-2xl font-semibold text-[#001a33]">
-                    <Link href={`/cursos/${cursos[currentCourseIndex]?.id}`}>
+                    <Link href={`/courses/${cursos[currentCourseIndex]?.id}`}>
                       {cursos.length > 0 ? cursos[currentCourseIndex]?.title : 'Curso Indisponível'}
                     </Link>
                   </h3>
